@@ -11,32 +11,34 @@ public class GribSection3 extends GribSection {
 
     private static final long serialVersionUID = 100L;
 
-    // Content and structure of a Section 3
-    public byte                     sourceOfGridDefinition;
-    public int                      numDataPoints;
-    public byte                     numOfOctetsForOptionalList;
-    public byte                     interpretationOfList;
-    public short                    gridDefinitionTemplateNumber;
-    public GridDefinitionTemplate3x gridDefinitionTemplate;
-    public byte[]                   optionalListOfPoints;
+    /**
+     * Content and structure of a Section 3
+     */
+    private byte                     sourceOfGridDefinition;
+    private int                      numDataPoints;
+    private byte                     numOfOctetsForOptionalList;
+    private byte                     interpretationOfList;
+    private short                    gridDefinitionTemplateNumber;
+    private GridDefinitionTemplate3x gridDefinitionTemplate;
+    private byte[]                   optionalListOfPoints;
 
-    public GribSection3(InputStream gribfile) throws IOException {
-        super(gribfile);
+    public GribSection3(InputStream gribFile) throws IOException {
+        super(gribFile);
     }
 
     public GribSection3(GribSection gribSection) {
-        super(gribSection.sectionlength, gribSection.sectionnumber, gribSection.sectiondata);
+        super(gribSection.getSectionLength(), gribSection.getSectionNumber(), gribSection.getSectionData());
     }
 
     @Override
-    public void readData(InputStream gribfile) throws IOException {
-        super.readData(gribfile);
+    public void readData(InputStream gribFile) throws IOException {
+        super.readData(gribFile);
         readSection();
     }
 
-    public void readSection() {
+    private void readSection() {
 
-        ByteBuffer byteBuffer = ByteBuffer.wrap(sectiondata);
+        ByteBuffer byteBuffer = ByteBuffer.wrap(getSectionData());
 
         // Parse section and extract data
         sourceOfGridDefinition = byteBuffer.get();
@@ -53,5 +55,61 @@ public class GribSection3 extends GribSection {
 
         optionalListOfPoints = new byte[numOfOctetsForOptionalList];
         byteBuffer.get(optionalListOfPoints);
+    }
+
+    public byte getSourceOfGridDefinition() {
+        return sourceOfGridDefinition;
+    }
+
+    public void setSourceOfGridDefinition(byte sourceOfGridDefinition) {
+        this.sourceOfGridDefinition = sourceOfGridDefinition;
+    }
+
+    public int getNumDataPoints() {
+        return numDataPoints;
+    }
+
+    public void setNumDataPoints(int numDataPoints) {
+        this.numDataPoints = numDataPoints;
+    }
+
+    public byte getNumOfOctetsForOptionalList() {
+        return numOfOctetsForOptionalList;
+    }
+
+    public void setNumOfOctetsForOptionalList(byte numOfOctetsForOptionalList) {
+        this.numOfOctetsForOptionalList = numOfOctetsForOptionalList;
+    }
+
+    public byte getInterpretationOfList() {
+        return interpretationOfList;
+    }
+
+    public void setInterpretationOfList(byte interpretationOfList) {
+        this.interpretationOfList = interpretationOfList;
+    }
+
+    public short getGridDefinitionTemplateNumber() {
+        return gridDefinitionTemplateNumber;
+    }
+
+    public void setGridDefinitionTemplateNumber(short gridDefinitionTemplateNumber) {
+        this.gridDefinitionTemplateNumber = gridDefinitionTemplateNumber;
+    }
+
+    public GridDefinitionTemplate3x getGridDefinitionTemplate() {
+        return gridDefinitionTemplate;
+    }
+
+    public void setGridDefinitionTemplate(GridDefinitionTemplate3x gridDefinitionTemplate) {
+        this.gridDefinitionTemplate = gridDefinitionTemplate;
+    }
+
+    public byte[] getOptionalListOfPoints() {
+        return optionalListOfPoints;
+    }
+
+    public void setOptionalListOfPoints(byte[] optionalListOfPoints) {
+        this.optionalListOfPoints = optionalListOfPoints;
     }
 }

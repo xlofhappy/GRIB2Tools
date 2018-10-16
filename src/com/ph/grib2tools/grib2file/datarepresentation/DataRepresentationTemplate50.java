@@ -8,16 +8,32 @@ public class DataRepresentationTemplate50 extends DataRepresentationTemplate5x {
 
     private static final long serialVersionUID = 100L;
 
-    public byte numberBits;
-    public byte typeOfField;
+    private byte numberBits;
+    private byte typeOfField;
 
 
     public DataRepresentationTemplate50(ByteBuffer byteBuffer) {
 
-        referenceValueR = byteBuffer.getFloat();
-        binaryScaleFactorE = GribSection.correctNegativeShort(byteBuffer.getShort());
-        decimalScaleFactorD = GribSection.correctNegativeShort(byteBuffer.getShort());
+        super.setReferenceValueR(byteBuffer.getFloat());
+        super.setDecimalScaleFactorD(GribSection.correctNegativeShort(byteBuffer.getShort()));
+        super.setBinaryScaleFactorE(GribSection.correctNegativeShort(byteBuffer.getShort()));
         numberBits = byteBuffer.get();
         typeOfField = byteBuffer.get();
+    }
+
+    public byte getNumberBits() {
+        return numberBits;
+    }
+
+    public void setNumberBits(byte numberBits) {
+        this.numberBits = numberBits;
+    }
+
+    public byte getTypeOfField() {
+        return typeOfField;
+    }
+
+    public void setTypeOfField(byte typeOfField) {
+        this.typeOfField = typeOfField;
     }
 }

@@ -13,10 +13,12 @@ public class GribSection5 extends GribSection {
 
     private static final long serialVersionUID = 100L;
 
-    // Content and structure of a Section 5
-    protected int                          numberDataPoints;
-    protected short                        dataRepresentationTemplateNumber;
-    public    DataRepresentationTemplate5x dataRepresentationTemplate;
+    /**
+     * Content and structure of a Section 5
+     */
+    private int                          numberDataPoints;
+    private short                        dataRepresentationTemplateNumber;
+    private DataRepresentationTemplate5x dataRepresentationTemplate;
 
 
     public GribSection5(InputStream gribfile) throws IOException {
@@ -24,7 +26,7 @@ public class GribSection5 extends GribSection {
     }
 
     public GribSection5(GribSection gribSection) {
-        super(gribSection.sectionlength, gribSection.sectionnumber, gribSection.sectiondata);
+        super(gribSection.getSectionLength(), gribSection.getSectionNumber(), gribSection.getSectionData());
     }
 
     @Override
@@ -33,9 +35,9 @@ public class GribSection5 extends GribSection {
         readSection();
     }
 
-    public void readSection() {
+    private void readSection() {
 
-        ByteBuffer byteBuffer = ByteBuffer.wrap(sectiondata);
+        ByteBuffer byteBuffer = ByteBuffer.wrap(getSectionData());
 
         // Parse section and extract data
         numberDataPoints = byteBuffer.getInt();
@@ -57,11 +59,32 @@ public class GribSection5 extends GribSection {
     }
 
     public float calcValue(short unsignedraw) {
-
         // Calculate value according to the GRIB specification
         int   raw = adjustUnsignedShort(unsignedraw);
-        float val = (dataRepresentationTemplate.referenceValueR + (float) (0 + raw) * (float) Math.pow(2, dataRepresentationTemplate.binaryScaleFactorE) / (float) Math.pow(10, dataRepresentationTemplate.decimalScaleFactorD));
+        return (dataRepresentationTemplate.getReferenceValueR() + (float) (0 + raw) * (float) Math.pow(2, dataRepresentationTemplate.getBinaryScaleFactorE()) / (float) Math.pow(10, dataRepresentationTemplate.getDecimalScaleFactorD()));
+    }
 
-        return val;
+    public int getNumberDataPoints() {
+        return numberDataPoints;
+    }
+
+    public void setNumberDataPoints(int numberDataPoints) {
+        this.numberDataPoints = numberDataPoints;
+    }
+
+    public short getDataRepresentationTemplateNumber() {
+        return dataRepresentationTemplateNumber;
+    }
+
+    public void setDataRepresentationTemplateNumber(short dataRepresentationTemplateNumber) {
+        this.dataRepresentationTemplateNumber = dataRepresentationTemplateNumber;
+    }
+
+    public DataRepresentationTemplate5x getDataRepresentationTemplate() {
+        return dataRepresentationTemplate;
+    }
+
+    public void setDataRepresentationTemplate(DataRepresentationTemplate5x dataRepresentationTemplate) {
+        this.dataRepresentationTemplate = dataRepresentationTemplate;
     }
 }

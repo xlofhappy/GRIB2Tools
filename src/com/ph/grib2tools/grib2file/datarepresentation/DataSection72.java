@@ -6,17 +6,23 @@ import java.nio.ByteBuffer;
 
 public class DataSection72 extends DataSection7x {
 
-    private static final long serialVersionUID = 100L;
+    /**
+     * 6-xx NG group reference values (XI in the decoding formula), each of which is encoded using the number of bits specified in octet 20 of Data Representation Template 5.0. Bits set to zero shall be appended as necessary to ensure this sequence of numbers ends on an octet boundary.
+     */
+    private int[] groupRefValues;
+    /**
+     * [xx+1]-yy NG group widths, each of which is encoded using the number of bits specified in octet 37 of Data Representation Template 5.2. Bits set to zero shall be appended as necessary to ensure this sequence of numbers ends on an octet boundary.
+     */
+    private int[] groupWidths;
+    /**
+     * [yy+1]-zz NG scaled group lengths, each of which is encoded using the number of bits specified in octet 47 of Data Representation Template 5.2. Bits set to zero shall be appended as necessary to ensure this sequence of numbers ends on an octet boundary. (see Note 14 of Data Representation Template 5.2)
+     */
+    private int[] scaledGroupLength;
 
-    // 6-xx              NG group reference values (XI in the decoding formula), each of which is encoded using the number of bits specified in octet 20 of Data Representation Template 5.0. Bits set to zero shall be appended as necessary to ensure this sequence of numbers ends on an octet boundary.
-    public int[] groupRefValues;
-    // [xx+1]-yy         NG group widths, each of which is encoded using the number of bits specified in octet 37 of Data Representation Template 5.2. Bits set to zero shall be appended as necessary to ensure this sequence of numbers ends on an octet boundary.
-    public int[] groupWidths;
-    // [yy+1]-zz         NG scaled group lengths, each of which is encoded using the number of bits specified in octet 47 of Data Representation Template 5.2. Bits set to zero shall be appended as necessary to ensure this sequence of numbers ends on an octet boundary. (see Note 14 of Data Representation Template 5.2)
-    public int[] scaledGroupLength;
 
-
-    // It's sucks but data are inverted.
+    /**
+     * It's sucks but data are inverted.
+     */
     protected DataSection72() {
     }
 
@@ -26,37 +32,37 @@ public class DataSection72 extends DataSection7x {
 
     protected final void readData72(int numberDataPoints, DataRepresentationTemplate52 representation,
                                     ByteBuffer byteBuffer) {
-        groupRefValues = new int[(int) representation.numberOfGroupsOfDataValues];
-        groupWidths = new int[(int) representation.numberOfGroupsOfDataValues];
-        scaledGroupLength = new int[(int) representation.numberOfGroupsOfDataValues];
-        variablePart = new int[numberDataPoints];
+        groupRefValues = new int[representation.getNumberOfGroupsOfDataValues()];
+        groupWidths = new int[representation.getNumberOfGroupsOfDataValues()];
+        scaledGroupLength = new int[representation.getNumberOfGroupsOfDataValues()];
+        setVariablePart(new int[numberDataPoints]);
         BitReader bR = new BitReader(byteBuffer);
         for ( int i = 0; i < groupRefValues.length; ++i ) {
-            groupRefValues[i] = bR.readBits(representation.numberBits);
+            groupRefValues[i] = bR.readBits(representation.getNumberBits());
         }
         bR.flushBit();
         for ( int i = 0; i < groupWidths.length; ++i ) {
-            groupWidths[i] = bR.readBits(representation.numberOfBitsUsedForTheGroupWidths);
+            groupWidths[i] = bR.readBits(representation.getNumberOfBitsUsedForTheGroupWidths());
         }
         bR.flushBit();
         for ( int i = 0; i < scaledGroupLength.length; ++i ) {
-            scaledGroupLength[i] = bR.readBits(representation.numberOfBitsForScaledGroupLengths);
+            scaledGroupLength[i] = bR.readBits(representation.getNumberOfBitsForScaledGroupLengths());
         }
         bR.flushBit();
 
         int groupWidth, idxGrp = 0, idxX = 0;
         // For each group except last
         for ( ; idxGrp < groupRefValues.length - 1; ++idxGrp ) {
-            int groupLength = scaledGroupLength[idxGrp] * representation.lengthIncrementForTheGroupLengths + representation.referenceForGroupLengths;
+            int groupLength = scaledGroupLength[idxGrp] * representation.getLengthIncrementForTheGroupLengths() + representation.getReferenceForGroupLengths();
             groupWidth = groupWidths[idxGrp];
             for ( int idxInGrp = 0; idxInGrp < groupLength; ++idxInGrp, ++idxX ) {
-                variablePart[idxX] = bR.readBits(groupWidth) + groupRefValues[idxGrp];
+                setVariablePart(idxX, bR.readBits(groupWidth) + groupRefValues[idxGrp]);
             }
         }
         // Read last group
         groupWidth = groupWidths[idxGrp];
-        for ( int idxInGrp = 0; idxInGrp < representation.trueLengthOfLastGroup; ++idxInGrp, ++idxX ) {
-            variablePart[idxX] = bR.readBits(groupWidth) + groupRefValues[idxGrp];
+        for ( int idxInGrp = 0; idxInGrp < representation.getTrueLengthOfLastGroup(); ++idxInGrp, ++idxX ) {
+            setVariablePart(idxX, bR.readBits(groupWidth) + groupRefValues[idxGrp]);
         }
     }
 

@@ -6,16 +6,14 @@ import java.nio.ByteBuffer;
 
 public class DataSection73 extends DataSection72 {
 
-    private static final long serialVersionUID = 100L;
-
     public int[] fstValuesOfOriginal;
 
     public DataSection73(int numberDataPoints, DataRepresentationTemplate53 representation, ByteBuffer byteBuffer) {
         // We cant read "parent" data here
         super();
-        fstValuesOfOriginal = new int[representation.orderOfSpatialDifferencing + 1];
+        fstValuesOfOriginal = new int[representation.getOrderOfSpatialDifferencing() + 1];
         for ( int i = 0; i < fstValuesOfOriginal.length; ++i ) {
-            switch ( representation.numberOfOctetsExtraDescriptors ) {
+            switch ( representation.getNumberOfOctetsExtraDescriptors() ) {
                 case 1:
                     fstValuesOfOriginal[i] = GribSection.correctNegativeByte(byteBuffer.get());
                     break;
@@ -26,7 +24,7 @@ public class DataSection73 extends DataSection72 {
                     fstValuesOfOriginal[i] = GribSection.correctNegativeInt(byteBuffer.getInt());
                     break;
                 default:
-                    throw new IllegalArgumentException(String.format("Unsupported nb of octets : %d", representation.numberOfOctetsExtraDescriptors));
+                    throw new IllegalArgumentException(String.format("Unsupported nb of octets : %d", representation.getNumberOfOctetsExtraDescriptors()));
             }
         }
         readData72(numberDataPoints, representation, byteBuffer);
@@ -36,10 +34,12 @@ public class DataSection73 extends DataSection72 {
         // ****************************************
         // WARNING : That's the part i am not sure : we lose the first 2 variablePart why ?
         // ****************************************
-        for ( int i = 0; i < fstValuesOfOriginal.length - 1; ++i ) { variablePart[i] = fstValuesOfOriginal[i]; }
+        for ( int i = 0; i < fstValuesOfOriginal.length - 1; ++i ) {
+            setVariablePart(i, fstValuesOfOriginal[i]);
+        }
         int on = fstValuesOfOriginal[fstValuesOfOriginal.length - 1];
-        for ( int i = fstValuesOfOriginal.length - 1; i < variablePart.length; ++i ) {
-            variablePart[i] = variablePart[i] + on + 2 * variablePart[i - 1] - variablePart[i - 2];
+        for ( int i = fstValuesOfOriginal.length - 1; i < getVariablePart().length; ++i ) {
+            setVariablePart(i, getVariablePart(i) + on + 2 * getVariablePart(i - 1) - getVariablePart(i - 2));
         }
     }
 }

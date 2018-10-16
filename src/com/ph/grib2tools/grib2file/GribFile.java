@@ -1,130 +1,143 @@
 package com.ph.grib2tools.grib2file;
 
+import com.ph.grib2tools.grib2file.datarepresentation.DataRepresentationTemplate5x;
+import com.ph.grib2tools.grib2file.griddefinition.GridDefinitionTemplate30;
+import com.ph.grib2tools.grib2file.griddefinition.GridDefinitionTemplate3x;
+import com.ph.grib2tools.grib2file.productdefinition.ProductDefinitionTemplate4x;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.logging.Logger;
 
-import com.ph.grib2tools.grib2file.datarepresentation.DataRepresentationTemplate50;
-import com.ph.grib2tools.grib2file.datarepresentation.DataRepresentationTemplate5x;
-import com.ph.grib2tools.grib2file.griddefinition.GridDefinitionTemplate30;
-import com.ph.grib2tools.grib2file.griddefinition.GridDefinitionTemplate3x;
-import com.ph.grib2tools.grib2file.productdefinition.ProductDefinitionTemplate40;
-import com.ph.grib2tools.grib2file.productdefinition.ProductDefinitionTemplate48;
-import com.ph.grib2tools.grib2file.productdefinition.ProductDefinitionTemplate4x;
-
 public abstract class GribFile implements Serializable {
 
     private static final long serialVersionUID = 100L;
 
-    // Maximum number of Sections 5, 6, 7 supported
-    protected final int MAXNUMSECTIONS567 = 10;
+    /**
+     * Maximum number of Sections 5, 6, 7 supported
+     */
+    protected final int MAX_NUM_SECTIONS_5_6_7 = 10;
 
-    // Conversation factor for converting GRIB file units to degree (for coordinates)
-    public static int GRIB2DEGUNIT = 1000000;
+    /**
+     * Conversation factor for converting GRIB file units to degree (for coordinates)
+     */
+    public static int GRIB2_DEG_UNIT = 1000000;
 
-    // A string for identifying the data set. For information only, so can
-    // be "" or null if not needed.
-    protected String typeid;
+    /**
+     * A string for identifying the data set. For information only, so can
+     * be "" or null if not needed.
+     */
+    protected String typeId;
 
-    // A string pointing to the source of the GRIB2 data. For information only,
-    // so can be "" or null if not needed
+    /**
+     * A string pointing to the source of the GRIB2 data. For information only,
+     * so can be "" or null if not needed
+     */
     protected String source;
 
-    // Sections of the GRIB file
-    protected GribSection0 section0;
-    protected GribSection1 section1;
-    protected GribSection2 section2;
-    protected GribSection3 section3;
-    protected GribSection4 section4;
-    protected GribSection5 section5[];
-    protected GribSection6 section6[];
-    protected GribSection7 section7[];
-    protected GribSection8 section8;
+    /**
+     * Sections of the GRIB file
+     */
+    protected GribSection0   section0;
+    protected GribSection1   section1;
+    protected GribSection2   section2;
+    protected GribSection3   section3;
+    protected GribSection4   section4;
+    protected GribSection5[] section5;
+    protected GribSection6[] section6;
+    protected GribSection7[] section7;
+    protected GribSection8   section8;
 
-    // Counter for multiple Sections 5, 6, 7
+    /**
+     * Counter for multiple Sections 5, 6, 7
+     */
     protected int gridcnt;
 
     private static final Logger log = Logger.getLogger(GribFile.class.getName());
 
 
-    public GribFile(String typeid, String source) {
+    public GribFile(String typeId, String source) {
 
-        this.typeid = typeid;
+        this.typeId = typeId;
         this.source = source;
 
         this.gridcnt = 0;
 
-        section5 = new GribSection5[MAXNUMSECTIONS567];
-        section6 = new GribSection6[MAXNUMSECTIONS567];
-        section7 = new GribSection7[MAXNUMSECTIONS567];
+        section5 = new GribSection5[MAX_NUM_SECTIONS_5_6_7];
+        section6 = new GribSection6[MAX_NUM_SECTIONS_5_6_7];
+        section7 = new GribSection7[MAX_NUM_SECTIONS_5_6_7];
     }
 
-    // Reads all data describing structure and type of the product, the data etc. The
-    // data itself is not read, also the end section (Section 8) is not considered.
-    // This offers the opportunity to process the data separately and independently.
-    //public void importMetadatFromStream(InputStream gribfile) {
-    public void importMetadatFromStream(InputStream gribfile) throws IOException {
-
-        if ( gribfile == null ) { return; }
-
+    /**
+     * Reads all data describing structure and type of the product, the data etc. The
+     * data itself is not read, also the end section (Section 8) is not considered.
+     * This offers the opportunity to process the data separately and independently.
+     * //public void importMetadatFromStream(InputStream gribFile) {
+     */
+    public void importMetadatFromStream(InputStream gribFile) throws IOException {
+        if ( gribFile == null ) {
+            return;
+        }
         // Read Section 0 and verify if the data is valid GRIB/GRIB2 data
-        section0 = new GribSection0(gribfile);
+        section0 = new GribSection0(gribFile);
         if ( !section0.verifyMagicNumber() ) {
             System.out.println("This is not a GRIB file");
         }
         if ( !section0.verifyGribVersion() ) {
             System.out.println("This is not a GRIB2 file");
         }
-
         // Process the GRIB file
         while ( true ) {
-
             // Read the next Section of the GRIB file
-            GribSection nextsection = new GribSection(gribfile).initSection();
+            GribSection nextsection = new GribSection(gribFile).initSection();
             //if (nextsection == null) continue;
             if ( nextsection == null ) { break; }
-            if ( nextsection.sectionnumber == 1 ) {
+            if ( nextsection.getSectionNumber() == 1 ) {
                 section1 = (GribSection1) nextsection;
-                section1.readData(gribfile);
-            } else if ( nextsection.sectionnumber == 2 ) {
+                section1.readData(gribFile);
+            } else if ( nextsection.getSectionNumber() == 2 ) {
                 section2 = (GribSection2) nextsection;
-                section2.readData(gribfile);
-            } else if ( nextsection.sectionnumber == 3 ) {
+                section2.readData(gribFile);
+            } else if ( nextsection.getSectionNumber() == 3 ) {
                 section3 = (GribSection3) nextsection;
-                section3.readData(gribfile);
-            } else if ( nextsection.sectionnumber == 4 ) {
+                section3.readData(gribFile);
+            } else if ( nextsection.getSectionNumber() == 4 ) {
                 section4 = (GribSection4) nextsection;
-                section4.readData(gribfile);
-            } else if ( nextsection.sectionnumber == 5 ) {
+                section4.readData(gribFile);
+            } else if ( nextsection.getSectionNumber() == 5 ) {
                 section5[gridcnt] = (GribSection5) nextsection;
-                section5[gridcnt].readData(gribfile);
-            } else if ( nextsection.sectionnumber == 6 ) {
+                section5[gridcnt].readData(gribFile);
+            } else if ( nextsection.getSectionNumber() == 6 ) {
                 section6[gridcnt] = (GribSection6) nextsection;
-                section6[gridcnt].readData(gribfile);
+                section6[gridcnt].readData(gribFile);
+                break;
+            } else {
+                // Stop processing the GRIB file if no known section is found
                 break;
             }
-
-            // Stop processing the GRIB file if no known section is found
-            else { break; }
         }
     }
 
-    // Handle Section 8 of a GRIB file
-    public void finalizeImport(InputStream gribfile) {
-
+    /**
+     * Handle Section 8 of a GRIB file
+     *
+     * @param gribFile
+     */
+    public void finalizeImport(InputStream gribFile) {
         // Read Section 8 and verify if the GRIB data is terminated correctly
-        section8 = new GribSection8(gribfile);
+        section8 = new GribSection8(gribFile);
         if ( !section8.verifyEndIdentifier() ) {
             System.out.println("End of GRIB file not reached.");
         }
     }
 
-    // Write the complete GRIB file data to an OutputStream
-    //public void writeToStream(OutputStream gribFile) {
+    /**
+     * Write the complete GRIB file data to an OutputStream
+     * //public void writeToStream(OutputStream gribFile) {
+     */
     public void writeToStream(OutputStream gribFile) throws IOException {
-
         section0.writeToStream(gribFile);
         section1.writeToStream(gribFile);
         section2.writeToStream(gribFile);
@@ -141,7 +154,7 @@ public abstract class GribFile implements Serializable {
     }
 
     public String getType() {
-        return typeid;
+        return typeId;
     }
 
     public String getSource() {
@@ -152,47 +165,46 @@ public abstract class GribFile implements Serializable {
         return gridcnt;
     }
 
-    // Returns the GridDefinitionTemplate of the GRIB file according to the Template Number
+    /**
+     * Returns the GridDefinitionTemplate of the GRIB file according to the Template Number
+     */
     public GridDefinitionTemplate3x getGridDefinitionTemplate() {
-
         GridDefinitionTemplate3x gridDefinition = null;
-
-        if ( section3.gridDefinitionTemplateNumber == 0 ) {
-            gridDefinition = (GridDefinitionTemplate30) section3.gridDefinitionTemplate;
+        if ( section3.getGridDefinitionTemplateNumber() == 0 ) {
+            gridDefinition = section3.getGridDefinitionTemplate();
         } else {
-            log.severe("Grid Definition Template Number 3." + section3.gridDefinitionTemplateNumber + " not implemented.");
+            log.severe("Grid Definition Template Number 3." + section3.getGridDefinitionTemplateNumber() + " not implemented.");
         }
-
         return gridDefinition;
     }
 
-    // Returns the ProductDefinitionTemplate of the GRIB file according to the Template Number
+    /**
+     * Returns the ProductDefinitionTemplate of the GRIB file according to the Template Number
+     */
     public ProductDefinitionTemplate4x getProductDefinitionTemplate() {
-
         ProductDefinitionTemplate4x productDefinition = null;
-
-        if ( section4.productDefinitionTemplateNumber == 0 ) {
-            productDefinition = (ProductDefinitionTemplate40) section4.productDefinitionTemplate;
-        } else if ( section4.productDefinitionTemplateNumber == 8 ) {
-            productDefinition = (ProductDefinitionTemplate48) section4.productDefinitionTemplate;
+        if ( section4.getProductDefinitionTemplateNumber() == 0 ) {
+            productDefinition = section4.getProductDefinitionTemplate();
+        } else if ( section4.getProductDefinitionTemplateNumber() == 8 ) {
+            productDefinition = section4.getProductDefinitionTemplate();
         } else {
-            log.severe("Product Definition Template Number 4." + section4.productDefinitionTemplateNumber + " not implemented.");
+            log.severe("Product Definition Template Number 4." + section4.getProductDefinitionTemplateNumber() + " not implemented.");
         }
-
         return productDefinition;
     }
 
-    // Returns the DataRepresentationTemplate of grid gridid of the GRIB file according to the Template Number
-    public DataRepresentationTemplate5x getDataRepresentationTemplate(int gridid) {
-
+    /**
+     * Returns the DataRepresentationTemplate of grid gridId of the GRIB file according to the Template Number
+     *
+     * @param gridId
+     */
+    public DataRepresentationTemplate5x getDataRepresentationTemplate(int gridId) {
         DataRepresentationTemplate5x dataRepresentation = null;
-
-        if ( section5[gridid].dataRepresentationTemplateNumber == 0 ) {
-            dataRepresentation = (DataRepresentationTemplate50) section5[gridid].dataRepresentationTemplate;
+        if ( section5[gridId].getDataRepresentationTemplateNumber() == 0 ) {
+            dataRepresentation = section5[gridId].getDataRepresentationTemplate();
         } else {
-            log.severe("Data Representation Template Number 5." + section5[gridid].dataRepresentationTemplateNumber + " not implemented.");
+            log.severe("Data Representation Template Number 5." + section5[gridId].getDataRepresentationTemplateNumber() + " not implemented.");
         }
-
         return dataRepresentation;
     }
 
@@ -216,16 +228,16 @@ public abstract class GribFile implements Serializable {
         return section4;
     }
 
-    public GribSection5 getSection5(int gridid) {
-        return section5[gridid];
+    public GribSection5 getSection5(int gridId) {
+        return section5[gridId];
     }
 
-    public GribSection6 getSection6(int gridid) {
-        return section6[gridid];
+    public GribSection6 getSection6(int gridId) {
+        return section6[gridId];
     }
 
-    public GribSection7 getSection7(int gridid) {
-        return section7[gridid];
+    public GribSection7 getSection7(int gridId) {
+        return section7[gridId];
     }
 
     public GribSection8 getSection8() {
@@ -273,7 +285,6 @@ public abstract class GribFile implements Serializable {
     }
 
     public static int getLonIndex(GridDefinitionTemplate30 gridDefinition, double longitude) {
-
         // Make sure that longitude is in a range from -180 to 180 degrees
         int firstPointLon = gridDefinition.firstPointLon;
         if ( firstPointLon >= GribFile.degToUnits(180) ) { firstPointLon -= GribFile.degToUnits(360); }
@@ -290,10 +301,10 @@ public abstract class GribFile implements Serializable {
     }
 
     public static double unitsToDeg(int units) {
-        return (double) units / GRIB2DEGUNIT;
+        return (double) units / GRIB2_DEG_UNIT;
     }
 
     public static int degToUnits(double deg) {
-        return (int) (deg * GRIB2DEGUNIT);
+        return (int) (deg * GRIB2_DEG_UNIT);
     }
 }

@@ -11,15 +11,19 @@ public class GribSection0 implements Serializable {
 
     private static final long serialVersionUID = 100L;
 
-    // Start identifier of a GRIB file
-    protected final static byte[] GRIBMAGICNUMBER = { 71, 82, 73, 66 };
+    /**
+     * Start identifier of a GRIB file "GRIB"
+     */
+    private final static byte[] GRIB_MAGIC_NUMBER = { 71, 82, 73, 66 };
 
-    // Content and structure of a Section 0
-    protected byte[] magicnumberbytes = new byte[4];
-    public    short  reserved;
-    public    byte   discipline;
-    protected byte   number;
-    protected long   totalLength;
+    /**
+     * Content and structure of a Section 0
+     */
+    private byte[] magicNumberBytes = new byte[4];
+    private short  reserved;
+    private byte   discipline;
+    private byte   number;
+    private long   totalLength;
 
 
     public GribSection0(InputStream gribfile) {
@@ -32,7 +36,7 @@ public class GribSection0 implements Serializable {
             ByteBuffer byteBuffer = ByteBuffer.wrap(section0);
 
             // Parse section and extract data
-            byteBuffer.get(magicnumberbytes);
+            byteBuffer.get(magicNumberBytes);
             reserved = byteBuffer.getShort();
             discipline = byteBuffer.get();
             number = byteBuffer.get();
@@ -45,28 +49,68 @@ public class GribSection0 implements Serializable {
     }
 
     public void writeToStream(OutputStream gribFile) {
-
-        DataOutputStream dataout = new DataOutputStream(gribFile);
-
+        DataOutputStream dataOut = new DataOutputStream(gribFile);
         try {
-
-            gribFile.write(magicnumberbytes);
-            dataout.writeShort(reserved);
+            gribFile.write(magicNumberBytes);
+            dataOut.writeShort(reserved);
             gribFile.write(discipline);
             gribFile.write(number);
-            dataout.writeLong(totalLength);
-
+            dataOut.writeLong(totalLength);
         } catch ( IOException e ) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
     public boolean verifyMagicNumber() {
-        return (ByteBuffer.wrap(magicnumberbytes).compareTo(ByteBuffer.wrap(GRIBMAGICNUMBER)) == 0);
+        return (ByteBuffer.wrap(magicNumberBytes).compareTo(ByteBuffer.wrap(GRIB_MAGIC_NUMBER)) == 0);
     }
 
     public boolean verifyGribVersion() {
         return (number == 2);
     }
+
+    public static byte[] getGRIBMAGICNUMBER() {
+        return GRIB_MAGIC_NUMBER;
+    }
+
+    public byte[] getMagicNumberBytes() {
+        return magicNumberBytes;
+    }
+
+    public void setMagicNumberBytes(byte[] magicNumberBytes) {
+        this.magicNumberBytes = magicNumberBytes;
+    }
+
+    public short getReserved() {
+        return reserved;
+    }
+
+    public void setReserved(short reserved) {
+        this.reserved = reserved;
+    }
+
+    public byte getDiscipline() {
+        return discipline;
+    }
+
+    public void setDiscipline(byte discipline) {
+        this.discipline = discipline;
+    }
+
+    public byte getNumber() {
+        return number;
+    }
+
+    public void setNumber(byte number) {
+        this.number = number;
+    }
+
+    public long getTotalLength() {
+        return totalLength;
+    }
+
+    public void setTotalLength(long totalLength) {
+        this.totalLength = totalLength;
+    }
+
 }

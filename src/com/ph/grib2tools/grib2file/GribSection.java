@@ -1,124 +1,159 @@
 package com.ph.grib2tools.grib2file;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.ByteBuffer;
 
-// Template of a GRIB Section, valid for Section types from 1 to 7. Not valid for Sections of type 0 and 8
+/**
+ * Template of a GRIB Section, valid for Section types from 1 to 7. Not valid for Sections of type 0 and 8
+ */
 public class GribSection implements Serializable {
 
     private static final long serialVersionUID = 100L;
 
-    // Length of the section
-    public int sectionlength;
-
-    // Section number
-    public byte sectionnumber;
-
-    // Data of the section
-    public byte[] sectiondata;
+    /**
+     * Length of the section
+     */
+    private int sectionLength;
+    /**
+     * Section number
+     */
+    private byte sectionNumber;
+    /**
+     * Data of the section
+     */
+    private byte[] sectionData;
 
 
     public GribSection(int len, byte num, byte[] data) {
-        sectionlength = len;
-        sectionnumber = num;
-        sectiondata = data;
+        sectionLength = len;
+        sectionNumber = num;
+        sectionData = data;
     }
 
-    public GribSection(InputStream gribfile) throws IOException {
+    public GribSection(InputStream gribFile) throws IOException {
 
 
         // All Sections of type 1 to 7 begin with a five byte long header. This header consists of a four byte
         // long length of the section, followed by a one byte section number (type)
-        byte[] sectionheader = new byte[5];
-        gribfile.read(sectionheader);
-        ByteBuffer byteBuffer = ByteBuffer.wrap(sectionheader);
+        byte[] sectionHeader = new byte[5];
+        gribFile.read(sectionHeader);
+        ByteBuffer byteBuffer = ByteBuffer.wrap(sectionHeader);
 
         // Extract section length and section number (type) from the header
-        sectionlength = byteBuffer.getInt();
-        sectionnumber = byteBuffer.get();
+        sectionLength = byteBuffer.getInt();
+        sectionNumber = byteBuffer.get();
     }
 
     public GribSection initSection() {
-
-        if ( sectionnumber == 1 ) { return new GribSection1(this); } else if ( sectionnumber == 2 ) {
+        if ( sectionNumber == 1 ) {
+            return new GribSection1(this);
+        } else if ( sectionNumber == 2 ) {
             return new GribSection2(this);
-        } else if ( sectionnumber == 3 ) {
+        } else if ( sectionNumber == 3 ) {
             return new GribSection3(this);
-        } else if ( sectionnumber == 4 ) {
+        } else if ( sectionNumber == 4 ) {
             return new GribSection4(this);
-        } else if ( sectionnumber == 5 ) {
+        } else if ( sectionNumber == 5 ) {
             return new GribSection5(this);
-        } else if ( sectionnumber == 6 ) {
+        } else if ( sectionNumber == 6 ) {
             return new GribSection6(this);
-        } else if ( sectionnumber == 7 ) {
+        } else if ( sectionNumber == 7 ) {
             return new GribSection7(this);
         } else {
-            System.out.println("Section Number " + sectionnumber + " not implemented");
+            System.out.println("Section Number " + sectionNumber + " not implemented");
         }
-
         return null;
     }
 
-    public void readData(InputStream gribfile) throws IOException {
-
+    public void readData(InputStream gribFile) throws IOException {
         // Read complete section
-        sectiondata = new byte[sectionlength - 5];
-        gribfile.read(sectiondata);
+        sectionData = new byte[sectionLength - 5];
+        gribFile.read(sectionData);
     }
 
     public void writeToStream(OutputStream gribFile) throws IOException {
-
-        DataOutputStream dataout = new DataOutputStream(gribFile);
-
-        dataout.writeInt(sectionlength);
-        gribFile.write(sectionnumber);
-        gribFile.write(sectiondata);
+        DataOutputStream dataOut = new DataOutputStream(gribFile);
+        dataOut.writeInt(sectionLength);
+        gribFile.write(sectionNumber);
+        gribFile.write(sectionData);
     }
 
-    // Adjust a one byte value extracted from a GRIB file according to the GRIB specification to obtain
-    // a correct unsigned byte
+    /**
+     * Adjust a one byte value extracted from a GRIB file according to the GRIB specification to obtain
+     * a correct unsigned byte
+     */
     public static short adjustUnsignedByte(int unsignedbyte) {
         return (short) ((unsignedbyte & 0x7F) + (unsignedbyte & 0x80));
     }
 
-    // Adjust a two byte value extracted from a GRIB file according to the GRIB specification to obtain
-    // a correct unsigned short
+    /**
+     * Adjust a two byte value extracted from a GRIB file according to the GRIB specification to obtain
+     * a correct unsigned short
+     **/
     public static int adjustUnsignedShort(int unsignedshort) {
         return (unsignedshort & 0x7FFF) + (unsignedshort & 0x8000);
     }
 
-    // Adjust a four byte value extracted from a GRIB file according to the GRIB specification to obtain
-    // a correct unsigned int
+    /**
+     * Adjust a four byte value extracted from a GRIB file according to the GRIB specification to obtain
+     * a correct unsigned int
+     */
     public static long adjustUnsignedInt(int unsignedint) {
         return (unsignedint & 0x7FFFFFFF) + (unsignedint & 0x80000000L);
     }
 
-    // Convert a one byte value extracted from a GRIB file according to the GRIB specification to recover
-    // the sign of a signed one
-    public static byte correctNegativeByte(byte uncorrectedvalue) {
-        byte correctedvalue = (byte) (uncorrectedvalue & 0x7f);
-        if ( (uncorrectedvalue & 0x80) == 0x80 ) { correctedvalue = (byte) -correctedvalue; }
-        assert uncorrectedvalue < 0x80 || uncorrectedvalue != correctedvalue;
-        return correctedvalue;
+    /**
+     * Convert a one byte value extracted from a GRIB file according to the GRIB specification to recover
+     * the sign of a signed one
+     */
+    public static byte correctNegativeByte(byte unCorrectedValue) {
+        byte correctedValue = (byte) (unCorrectedValue & 0x7f);
+        if ( (unCorrectedValue & 0x80) == 0x80 ) { correctedValue = (byte) -correctedValue; }
+        assert unCorrectedValue < 0x80 || unCorrectedValue != correctedValue;
+        return correctedValue;
     }
 
-    // Convert a two byte value extracted from a GRIB file according to the GRIB specification to recover
-    // the sign of a signed short
-    public static short correctNegativeShort(short uncorrectedvalue) {
-        short correctedvalue = (short) (uncorrectedvalue & 0x7fff);
-        if ( (uncorrectedvalue & 0x8000) == 0x8000 ) { correctedvalue = (short) -correctedvalue; }
-        return correctedvalue;
+    /**
+     * Convert a two byte value extracted from a GRIB file according to the GRIB specification to recover
+     * the sign of a signed short
+     */
+    public static short correctNegativeShort(short unCorrectedValue) {
+        short correctedValue = (short) (unCorrectedValue & 0x7fff);
+        if ( (unCorrectedValue & 0x8000) == 0x8000 ) { correctedValue = (short) -correctedValue; }
+        return correctedValue;
     }
 
-    // Convert a four byte value extracted from a GRIB file according to the GRIB specification to recover
-    // the sign of a signed int
-    public static int correctNegativeInt(int uncorrectedvalue) {
-        int correctedvalue = uncorrectedvalue & 0x7fffffff;
-        if ( (uncorrectedvalue & 0x80000000L) == 0x80000000L ) { correctedvalue = -correctedvalue; }
-        return correctedvalue;
+    /**
+     * Convert a four byte value extracted from a GRIB file according to the GRIB specification to recover
+     * the sign of a signed int
+     */
+    public static int correctNegativeInt(int unCorrectedValue) {
+        int correctedValue = unCorrectedValue & 0x7fffffff;
+        if ( (unCorrectedValue & 0x80000000L) == 0x80000000L ) { correctedValue = -correctedValue; }
+        return correctedValue;
+    }
+
+    public int getSectionLength() {
+        return sectionLength;
+    }
+
+    public void setSectionLength(int sectionLength) {
+        this.sectionLength = sectionLength;
+    }
+
+    public byte getSectionNumber() {
+        return sectionNumber;
+    }
+
+    public void setSectionNumber(byte sectionNumber) {
+        this.sectionNumber = sectionNumber;
+    }
+
+    public byte[] getSectionData() {
+        return sectionData;
+    }
+
+    public void setSectionData(byte[] sectionData) {
+        this.sectionData = sectionData;
     }
 }

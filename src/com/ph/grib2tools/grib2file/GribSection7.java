@@ -23,7 +23,7 @@ public class GribSection7 extends GribSection {
     }
 
     public GribSection7(GribSection gribSection) {
-        super(gribSection.sectionlength, gribSection.sectionnumber, gribSection.sectiondata);
+        super(gribSection.getSectionLength(), gribSection.getSectionNumber(), gribSection.getSectionData());
     }
 
     @Override
@@ -33,8 +33,10 @@ public class GribSection7 extends GribSection {
     }
 
     public void readSection() {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(sectiondata);
-        if ( dataRepresentation.getClass().equals(DataRepresentationTemplate50.class) ) { /* Nothing to do */ } else if ( dataRepresentation.getClass().equals(DataRepresentationTemplate52.class) ) {
+        ByteBuffer byteBuffer = ByteBuffer.wrap(getSectionData());
+        if ( dataRepresentation.getClass().equals(DataRepresentationTemplate50.class) ) {
+            /* Nothing to do */
+        } else if ( dataRepresentation.getClass().equals(DataRepresentationTemplate52.class) ) {
             data = new DataSection72(numberDataPoints, (DataRepresentationTemplate52) dataRepresentation, byteBuffer);
         } else if ( dataRepresentation.getClass().equals(DataRepresentationTemplate53.class) ) {
             data = new DataSection73(numberDataPoints, (DataRepresentationTemplate53) dataRepresentation, byteBuffer);

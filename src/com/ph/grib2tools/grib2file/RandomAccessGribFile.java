@@ -8,9 +8,11 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.logging.Logger;
 
-// A representation of a GRIB file containing all meta data and allowing a random
-// access to the data of the GRIB file. While the random access allows great flexibility
-// it requires that the complete data is held in memory 
+/**
+ * A representation of a GRIB file containing all meta data and allowing a random
+ * access to the data of the GRIB file. While the random access allows great flexibility
+ * it requires that the complete data is held in memory
+ **/
 public class RandomAccessGribFile extends GribFile {
 
     private static final long serialVersionUID = 100L;
@@ -18,17 +20,17 @@ public class RandomAccessGribFile extends GribFile {
     private static final Logger log = Logger.getLogger(RandomAccessGribFile.class.getName());
 
 
-    public RandomAccessGribFile(String typeid, String source) {
-        super(typeid, source);
+    public RandomAccessGribFile(String typeId, String source) {
+        super(typeId, source);
     }
 
-    public void importFromStream(InputStream gribfile, int numskip) throws IOException {
+    public void importFromStream(InputStream gribFile, int numSkip) throws IOException {
 
-        if ( gribfile == null ) { return; }
+        if ( gribFile == null ) { return; }
 
         // By overwriting the section variables, the first numskip GRIB file data structures
         // within a stream or a file can be skipped
-        for ( int t = 0; t < numskip + 1; t++ ) {
+        for ( int t = 0; t < numSkip + 1; t++ ) {
 
             gridcnt = 0;
 
@@ -36,48 +38,52 @@ public class RandomAccessGribFile extends GribFile {
             while ( gridcnt < 1 ) {
 
                 // Read all meta data but not the data itself in Section 7
-                importMetadatFromStream(gribfile);
+                importMetadatFromStream(gribFile);
 
                 // Read the data of Section 7 into memory
-                GribSection nextsection = new GribSection(gribfile).initSection();
-                if ( nextsection.sectionnumber == 7 ) {
-                    section7[gridcnt] = (GribSection7) nextsection;
+                GribSection nextSection = new GribSection(gribFile).initSection();
+                if ( nextSection.getSectionNumber() == 7 ) {
+                    section7[gridcnt] = (GribSection7) nextSection;
                     section7[gridcnt].setDataRepresentation(section5[gridcnt].numberDataPoints, section5[gridcnt].dataRepresentationTemplate);
-                    section7[gridcnt].readData(gribfile);
+                    section7[gridcnt].readData(gribFile);
                     gridcnt++;
                 } else {
-                    log.warning("Section " + nextsection.sectionnumber + " found while Section 7 expected. aborting.");
+                    log.warning("Section " + nextSection.getSectionNumber() + " found while Section 7 expected. aborting.");
                     return;
                 }
             }
 
-            finalizeImport(gribfile);
+            finalizeImport(gribFile);
         }
     }
 
-    // Extracts the data belonging to the passed coordinate (lat, lon) in degrees and returns the
-    // value represented by this data. If the passed coordinate is not a grid point of the
-    // data grid, the data belonging to the grid point closest to the passed position
-    // is considered.
-    public float getValueAtLocation(int grididx, double lat, double lon) {
-        return getValueAt(grididx, GribFile.degToUnits(lat), GribFile.degToUnits(lon));
+    /**
+     * Extracts the data belonging to the passed coordinate (lat, lon) in degrees and returns the
+     * value represented by this data. If the passed coordinate is not a grid point of the
+     * data grid, the data belonging to the grid point closest to the passed position
+     * is considered.
+     */
+    public float getValueAtLocation(int gridIdx, double lat, double lon) {
+        return getValueAt(gridIdx, GribFile.degToUnits(lat), GribFile.degToUnits(lon));
     }
 
-    // Extracts the data belonging to the passed coordinate (lat, lon) in units and returns the
-    // value represented by this data. If the passed coordinate is not a grid point of the
-    // data grid, the data belonging to the grid point closest to the passed position
-    // is considered.
-    public float getValueAt(int grididx, int lat, int lon) {
+    /**
+     * Extracts the data belonging to the passed coordinate (lat, lon) in units and returns the
+     * value represented by this data. If the passed coordinate is not a grid point of the
+     * data grid, the data belonging to the grid point closest to the passed position
+     * is considered.
+     */
+    public float getValueAt(int gridIdx, int lat, int lon) {
 
-        GribSection5 sec5 = getSection5(grididx);
-        GribSection7 sec7 = getSection7(grididx);
+        GribSection5 sec5 = getSection5(gridIdx);
+        GribSection7 sec7 = getSection7(gridIdx);
 
         float val = 0;
 
         if ( sec5.dataRepresentationTemplateNumber == 0 ) {
 
             DataRepresentationTemplate50 dataRepresentation = (DataRepresentationTemplate50) sec5.dataRepresentationTemplate;
-            int                          bytesperval        = dataRepresentation.numberBits / 8;
+            int                          bytesperval        = dataRepresentation.getNumberBits() / 8;
 
             if ( section3.gridDefinitionTemplateNumber == 0 ) {
 
@@ -122,7 +128,7 @@ public class RandomAccessGribFile extends GribFile {
                 int iidx     = Math.round((float) deltalon / (float) gridDefinition.iDirectionIncrement);
 
                 // Extract data belonging to the referred location and calculate the value represented by the data
-                byte  data[]      = sec7.sectiondata;
+                byte  data[]      = sec7.getSectionData();
                 short unsignedraw = ByteBuffer.wrap(data).getShort((jidx * gridDefinition.numberPointsLon + iidx) * bytesperval);
                 val = sec5.calcValue(unsignedraw);
             } else {
@@ -135,29 +141,33 @@ public class RandomAccessGribFile extends GribFile {
         return val;
     }
 
-    // Extracts the data belonging to the passed coordinate (lat, lon) in degrees and returns the
-    // value represented by this data. If the passed coordinate is not a grid point of the
-    // data grid, the data belonging to the neighbored grid points is interpolated and used
-    // to calculate the value belonging to the passed position.
-    public float interpolateValueAtLocation(int grididx, double lat, double lon) {
-        return interpolateValueAt(grididx, GribFile.degToUnits(lat), GribFile.degToUnits(lon));
+    /**
+     * Extracts the data belonging to the passed coordinate (lat, lon) in degrees and returns the
+     * value represented by this data. If the passed coordinate is not a grid point of the
+     * data grid, the data belonging to the neighbored grid points is interpolated and used
+     * to calculate the value belonging to the passed position.
+     */
+    public float interpolateValueAtLocation(int gridIdx, double lat, double lon) {
+        return interpolateValueAt(gridIdx, GribFile.degToUnits(lat), GribFile.degToUnits(lon));
     }
 
-    // Extracts the data belonging to the passed coordinate (lat, lon) in units and returns the
-    // value represented by this data. If the passed coordinate is not a grid point of the
-    // data grid, the data belonging to the neighbored grid points is interpolated and used
-    // to calculate the value belonging to the passed position.
-    public float interpolateValueAt(int grididx, int lat, int lon) {
+    /**
+     * Extracts the data belonging to the passed coordinate (lat, lon) in units and returns the
+     * value represented by this data. If the passed coordinate is not a grid point of the
+     * data grid, the data belonging to the neighbored grid points is interpolated and used
+     * to calculate the value belonging to the passed position.
+     */
+    public float interpolateValueAt(int gridIdx, int lat, int lon) {
 
-        GribSection5 sec5 = getSection5(grididx);
-        GribSection7 sec7 = getSection7(grididx);
+        GribSection5 sec5 = getSection5(gridIdx);
+        GribSection7 sec7 = getSection7(gridIdx);
 
         float val = 0;
 
         if ( sec5.dataRepresentationTemplateNumber == 0 ) {
 
             DataRepresentationTemplate50 dataRepresentation = (DataRepresentationTemplate50) sec5.dataRepresentationTemplate;
-            int                          bytesperval        = dataRepresentation.numberBits / 8;
+            int                          bytesperval        = dataRepresentation.getNumberBits() / 8;
 
             if ( section3.gridDefinitionTemplateNumber == 0 ) {
 
@@ -213,7 +223,7 @@ public class RandomAccessGribFile extends GribFile {
                 int iidx2 = iidx1 + 1;
 
 
-                byte data[] = sec7.sectiondata;
+                byte data[] = sec7.getSectionData();
 
                 // Extract data of the four grid points surrounding the passed coordinate and calculate the
                 // values represented by the data

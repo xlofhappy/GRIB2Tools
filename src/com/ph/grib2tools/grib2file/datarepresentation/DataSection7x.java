@@ -7,5 +7,21 @@ public class DataSection7x {
      * See "Guide to the WMO Table Driven Code Form Used for the Representation and Exchange of Regularly
      * Spaced Data In Binary Form"
      */
-    public int[] variablePart;
+    private int[] variablePart;
+
+    public int[] getVariablePart() {
+        return variablePart;
+    }
+
+    public int getVariablePart(int idx) {
+        return variablePart[idx];
+    }
+
+    public void setVariablePart(int[] variablePart) {
+        this.variablePart = variablePart;
+    }
+
+    public void setVariablePart(int idx, int value) {
+        this.variablePart[idx] = value;
+    }
 }

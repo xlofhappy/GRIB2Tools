@@ -8,7 +8,9 @@ public class GribSection1 extends GribSection {
 
     private static final long serialVersionUID = 100L;
 
-    // Content and structure of a Section 1
+    /**
+     * Content and structure of a Section 1
+     */
     public short generatingCentre;
     public short generatingSubcentre;
     public byte  masterTablesVersion;
@@ -24,23 +26,23 @@ public class GribSection1 extends GribSection {
     public byte  type;
 
 
-    public GribSection1(InputStream gribfile) throws IOException {
-        super(gribfile);
+    public GribSection1(InputStream gribFile) throws IOException {
+        super(gribFile);
     }
 
     public GribSection1(GribSection gribSection) {
-        super(gribSection.sectionlength, gribSection.sectionnumber, gribSection.sectiondata);
+        super(gribSection.getSectionLength(), gribSection.getSectionNumber(), gribSection.getSectionData());
     }
 
     @Override
-    public void readData(InputStream gribfile) throws IOException {
-        super.readData(gribfile);
+    public void readData(InputStream gribFile) throws IOException {
+        super.readData(gribFile);
         readSection();
     }
 
-    public void readSection() {
+    private void readSection() {
 
-        ByteBuffer byteBuffer = ByteBuffer.wrap(sectiondata);
+        ByteBuffer byteBuffer = ByteBuffer.wrap(getSectionData());
 
         // Parse section and extract data
         generatingCentre = byteBuffer.getShort();

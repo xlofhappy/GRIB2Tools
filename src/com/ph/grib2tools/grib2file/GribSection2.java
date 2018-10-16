@@ -7,20 +7,20 @@ public class GribSection2 extends GribSection {
 
     private static final long serialVersionUID = 100L;
 
-    public GribSection2(InputStream gribfile) throws IOException {
-        super(gribfile);
+    public GribSection2(InputStream gribFile) throws IOException {
+        super(gribFile);
     }
 
     public GribSection2(GribSection gribSection) {
-        super(gribSection.sectionlength, gribSection.sectionnumber, gribSection.sectiondata);
+        super(gribSection.getSectionLength(), gribSection.getSectionNumber(), gribSection.getSectionData());
     }
 
     @Override
-    public void readData(InputStream gribfile) throws IOException {
-        super.readData(gribfile);
+    public void readData(InputStream gribFile) throws IOException {
+        super.readData(gribFile);
         readSection();
     }
 
-    public void readSection() {
+    private void readSection() {
     }
 }

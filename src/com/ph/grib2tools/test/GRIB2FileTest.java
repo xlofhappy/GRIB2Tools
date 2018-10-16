@@ -14,13 +14,14 @@ public class GRIB2FileTest {
 
     public static void main(String[] args) {
 
-        if ( args.length < 1 ) {
-            System.out.println("Syntax: java GRIB2FileTest <filename> <structureid (optional)>");
-            return;
-        }
+//        if ( args.length < 1 ) {
+//            System.out.println("Syntax: java GRIB2FileTest <filename> <structureid (optional)>");
+//            return;
+//        }
 
         // Name of the GRIB2 file
-        String filename = args[0];
+//        String filename = args[0];
+        String filename = "/Users/xiaole/gfs.t18z.pgrb2.1p00.f000.grb";
 
         // Defines how many GRIB file structures shall be skipped when reading the GRIB2 file. This
         // is useful since some organizations put several GRIB2 file structures in one file.
@@ -50,15 +51,15 @@ public class GRIB2FileTest {
             System.out.println("Generating centre: " + section1.generatingCentre);
             // Get product information
             ProductDefinitionTemplate40 productDefinition = (ProductDefinitionTemplate40) gribFile.getProductDefinitionTemplate();
-            System.out.println("Forecast time: " + productDefinition.forecastTime);
-            System.out.println("Parameter category: " + productDefinition.parameterCategory);
-            System.out.println("Parameter number: " + productDefinition.parameterNumber);
+            System.out.println("Forecast time: " + productDefinition.getForecastTime());
+            System.out.println("Parameter category: " + productDefinition.getParameterCategory());
+            System.out.println("Parameter number: " + productDefinition.getParameterNumber());
 
             // Get grid information
             GridDefinitionTemplate30 gridDefinition = (GridDefinitionTemplate30) gribFile.getGridDefinitionTemplate();
             System.out.println("Covered area:");
-            System.out.println("   from (latitude, longitude): " + GribFile.unitsToDeg(gridDefinition.firstPointLat) + ", " + GribFile.unitsToDeg(gridDefinition.firstPointLon));
-            System.out.println("   to: (latitude, longitude): " + GribFile.unitsToDeg(gridDefinition.lastPointLat) + ", " + GribFile.unitsToDeg(gridDefinition.lastPointLon));
+            System.out.println("   from (latitude, longitude): " + GribFile.unitsToDeg(gridDefinition.getFirstPointLat()) + ", " + GribFile.unitsToDeg(gridDefinition.getFirstPointLon()));
+            System.out.println("   to: (latitude, longitude): " + GribFile.unitsToDeg(gridDefinition.getLastPointLat()) + ", " + GribFile.unitsToDeg(gridDefinition.getLastPointLon()));
 
             // Get grid data
             double latitude  = 52.52;

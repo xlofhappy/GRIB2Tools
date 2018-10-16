@@ -10,10 +10,14 @@ public class GribSection8 implements Serializable {
 
     private static final long serialVersionUID = 100L;
 
-    // End identifier of a GRIB file
+    /**
+     * End identifier of a GRIB file
+     */
     protected final static byte[] GRIBENDIDENTIFIER = { 55, 55, 55, 55 };
 
-    // Content and structure of a Section 8
+    /**
+     * Content and structure of a Section 8
+     */
     byte[] endidentifierbytes = new byte[4];
 
 
@@ -28,19 +32,14 @@ public class GribSection8 implements Serializable {
             byteBuffer.get(endidentifierbytes);
 
         } catch ( Exception e ) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
     public void writeToStream(OutputStream gribFile) {
-
         try {
-
             gribFile.write(endidentifierbytes);
-
         } catch ( IOException e ) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
