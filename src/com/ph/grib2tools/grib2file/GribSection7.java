@@ -12,7 +12,7 @@ public class GribSection7 extends GribSection {
 
     private int                          numberDataPoints;
     private DataRepresentationTemplate5x dataRepresentation;
-    public  DataSection7x                data;
+    private DataSection7x                data;
 
     public GribSection7(int len, byte num, byte[] data) {
         super(len, num, data);
@@ -48,5 +48,29 @@ public class GribSection7 extends GribSection {
     public void setDataRepresentation(int numberDataPoints, DataRepresentationTemplate5x dataRepresentation) {
         this.numberDataPoints = numberDataPoints;
         this.dataRepresentation = dataRepresentation;
+    }
+
+    public int getNumberDataPoints() {
+        return numberDataPoints;
+    }
+
+    public void setNumberDataPoints(int numberDataPoints) {
+        this.numberDataPoints = numberDataPoints;
+    }
+
+    public DataRepresentationTemplate5x getDataRepresentation() {
+        return dataRepresentation;
+    }
+
+    public void setDataRepresentation(DataRepresentationTemplate5x dataRepresentation) {
+        this.dataRepresentation = dataRepresentation;
+    }
+
+    public DataSection7x getData() {
+        return data;
+    }
+
+    public void setData(DataSection7x data) {
+        this.data = data;
     }
 }

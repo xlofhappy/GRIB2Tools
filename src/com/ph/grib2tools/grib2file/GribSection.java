@@ -31,8 +31,6 @@ public class GribSection implements Serializable {
     }
 
     public GribSection(InputStream gribFile) throws IOException {
-
-
         // All Sections of type 1 to 7 begin with a five byte long header. This header consists of a four byte
         // long length of the section, followed by a one byte section number (type)
         byte[] sectionHeader = new byte[5];

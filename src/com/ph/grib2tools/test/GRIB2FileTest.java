@@ -61,9 +61,13 @@ public class GRIB2FileTest {
             System.out.println("   from (latitude, longitude): " + GribFile.unitsToDeg(gridDefinition.getFirstPointLat()) + ", " + GribFile.unitsToDeg(gridDefinition.getFirstPointLon()));
             System.out.println("   to: (latitude, longitude): " + GribFile.unitsToDeg(gridDefinition.getLastPointLat()) + ", " + GribFile.unitsToDeg(gridDefinition.getLastPointLon()));
 
+
+            for ( int i : gribFile.getSection7(0).getData().getVariablePart() ) {
+                System.out.println(i+ " \t " +gribFile.getSection7(0).getData().getVariablePart()[i]);
+            }
             // Get grid data
-            double latitude  = 52.52;
-            double longitude = 13.38;
+            double latitude  = 1;
+            double longitude = 1;
             System.out.println("Value at (" + latitude + ", " + longitude + "): " + gribFile.interpolateValueAtLocation(gridid, latitude, longitude));
 
         } catch ( Exception e ) {

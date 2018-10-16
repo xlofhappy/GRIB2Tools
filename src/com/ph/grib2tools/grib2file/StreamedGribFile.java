@@ -34,7 +34,6 @@ public class StreamedGribFile extends GribFile {
         // By overwriting the section variables, the first numSkip GRIB file data structures
         // within a stream or a file can be skipped
         for ( int t = 0; t < numSkip + 1; t++ ) {
-
             gridcnt = 0;
 
             // Read all meta data but not the data itself in Section 7
@@ -42,16 +41,15 @@ public class StreamedGribFile extends GribFile {
 
             // Consider Section 7 but do not read its data into memory
             GribSection nextsection = new GribSection(gribFile).initSection();
-            if ( nextsection.sectionnumber == 7 ) {
+            if ( nextsection.getSectionNumber() == 7 ) {
                 section7[gridcnt] = (GribSection7) nextsection;
                 gridcnt++;
             } else {
-                log.warning("Section " + nextsection.sectionnumber + " found while Section 7 expected. aborting.");
+                log.warning("Section " + nextsection.getSectionNumber() + " found while Section 7 expected. aborting.");
                 return false;
             }
-
             // End import of data if a Section 7 does not contain any data
-            if ( section7[gridcnt - 1].sectionlength == 5 ) { finalizeImport(gribFile1); }
+            if ( section7[gridcnt - 1].getSectionLength() == 5 ) { finalizeImport(gribFile1); }
         }
 
         return true;
@@ -62,30 +60,23 @@ public class StreamedGribFile extends GribFile {
      * by the data
      */
     public float nextValue() throws IOException {
-
         int gridIdx = 0;
-
         GribSection5 sec5 = getSection5(gridIdx);
-
         float val = 0;
-
-        if ( sec5.dataRepresentationTemplateNumber == 0 ) {
-
+        if ( sec5.getDataRepresentationTemplateNumber() == 0 ) {
             // Get the resolution of the data (number of bytes per value)
-            DataRepresentationTemplate50 dataRepresentation = (DataRepresentationTemplate50) sec5.dataRepresentationTemplate;
-            int                          bytesperval        = dataRepresentation.numberBits / 8;
-
+            DataRepresentationTemplate50 dataRepresentation = (DataRepresentationTemplate50) sec5.getDataRepresentationTemplate();
+            int                          bytesperval        = dataRepresentation.getNumberBits() / 8;
             // Read data from data stream
             byte[] data = new byte[bytesperval];
             gribFile.read(data);
 
             // Determine the value represented by the data
-            short unsigneDraw = ByteBuffer.wrap(data).getShort();
-            val = sec5.calcValue(unsigneDraw);
+            short unsignedDraw = ByteBuffer.wrap(data).getShort();
+            val = sec5.calcValue(unsignedDraw);
         } else {
-            log.warning("Data Representation Template Number 5." + sec5.dataRepresentationTemplateNumber + " not implemented.");
+            log.warning("Data Representation Template Number 5." + sec5.getDataRepresentationTemplateNumber() + " not implemented.");
         }
-
         return val;
     }
 }

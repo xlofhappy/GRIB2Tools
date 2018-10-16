@@ -281,15 +281,15 @@ public abstract class GribFile implements Serializable {
     }
 
     public static int getLatIndex(GridDefinitionTemplate30 gridDefinition, double latitude) {
-        return (GribFile.degToUnits(latitude) - gridDefinition.firstPointLat) / gridDefinition.jDirectionIncrement;
+        return (GribFile.degToUnits(latitude) - gridDefinition.getFirstPointLat()) / gridDefinition.getjDirectionIncrement();
     }
 
     public static int getLonIndex(GridDefinitionTemplate30 gridDefinition, double longitude) {
         // Make sure that longitude is in a range from -180 to 180 degrees
-        int firstPointLon = gridDefinition.firstPointLon;
+        int firstPointLon = gridDefinition.getFirstPointLon();
         if ( firstPointLon >= GribFile.degToUnits(180) ) { firstPointLon -= GribFile.degToUnits(360); }
 
-        return (GribFile.degToUnits(longitude) - firstPointLon) / gridDefinition.iDirectionIncrement;
+        return (GribFile.degToUnits(longitude) - firstPointLon) / gridDefinition.getiDirectionIncrement();
     }
 
     public static long getVersion() {
