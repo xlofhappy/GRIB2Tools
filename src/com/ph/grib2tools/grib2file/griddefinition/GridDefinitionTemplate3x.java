@@ -4,5 +4,5 @@ import java.io.Serializable;
 
 public class GridDefinitionTemplate3x implements Serializable {
 
-	private static final long serialVersionUID = 100L;
+    private static final long serialVersionUID = 100L;
 }
