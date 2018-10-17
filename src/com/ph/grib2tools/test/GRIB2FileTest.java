@@ -45,7 +45,7 @@ public class GRIB2FileTest {
             GribSection1 section1 = gribFile.getSection1();
             System.out.println("Date: " + String.format("%02d", section1.getDay()) + "." + String.format("%02d", section1.getMonth()) + "." + section1.getYear());
             System.out.println("Time: " + String.format("%02d", section1.getHour()) + ":" + String.format("%02d", section1.getMinute()) + "." + String.format("%02d", section1.getSecond()));
-            System.out.println("Generating centre: " + section1.getGeneratingCentre());
+            System.out.println("Generating centre: " + section1.getGeneratingCenterName());
             // Get product information
             ProductDefinitionTemplate40 productDefinition = (ProductDefinitionTemplate40) gribFile.getProductDefinitionTemplate();
             System.out.println("Forecast time: " + productDefinition.getForecastTime());

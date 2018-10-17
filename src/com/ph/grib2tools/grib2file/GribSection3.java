@@ -40,11 +40,15 @@ public class GribSection3 extends GribSection {
 
         ByteBuffer byteBuffer = ByteBuffer.wrap(getSectionData());
 
-        // Parse section and extract data
+        // 6
         sourceOfGridDefinition = byteBuffer.get();
+        // 7-10
         numDataPoints = byteBuffer.getInt();
+        // 11
         numOfOctetsForOptionalList = byteBuffer.get();
+        // 12
         interpretationOfList = byteBuffer.get();
+        // 13-14
         gridDefinitionTemplateNumber = byteBuffer.getShort();
 
         if ( gridDefinitionTemplateNumber == 0 ) {

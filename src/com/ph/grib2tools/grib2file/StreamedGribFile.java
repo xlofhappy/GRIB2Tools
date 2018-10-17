@@ -3,7 +3,7 @@ package com.ph.grib2tools.grib2file;
 import com.ph.grib2tools.grib2file.datarepresentation.DataRepresentationTemplate50;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.logging.Logger;
 
@@ -14,9 +14,7 @@ import java.util.logging.Logger;
  */
 public class StreamedGribFile extends Grib2File {
 
-    private static final long serialVersionUID = 100L;
-
-    protected InputStream gribFile;
+    protected RandomAccessFile grib2File;
 
     private static final Logger log = Logger.getLogger(StreamedGribFile.class.getName());
 
@@ -25,11 +23,11 @@ public class StreamedGribFile extends Grib2File {
         super(typeid, source);
     }
 
-    public boolean prepareImportFromStream(InputStream gribFile1, int numSkip) throws IOException {
+    public boolean prepareImportFromStream(RandomAccessFile grib2File, int numSkip) throws IOException {
 
-        this.gribFile = gribFile1;
+        this.grib2File = grib2File;
 
-        if ( gribFile == null ) { return false; }
+        if ( grib2File == null ) { return false; }
 
         // By overwriting the section variables, the first numSkip GRIB file data structures
         // within a stream or a file can be skipped
@@ -37,19 +35,19 @@ public class StreamedGribFile extends Grib2File {
             gridcnt = 0;
 
             // Read all meta data but not the data itself in Section 7
-            importMetadataFromStream(gribFile);
+            importMetadataFromStream(grib2File);
 
             // Consider Section 7 but do not read its data into memory
-            GribSection nextsection = new GribSection(gribFile).initSection();
-            if ( nextsection.getSectionNumber() == 7 ) {
-                section7[gridcnt] = (GribSection7) nextsection;
+            short sectionNumber = GribSection.sectionNumber(grib2File);
+            if ( sectionNumber == 7 ) {
+                section7[gridcnt] = new GribSection7(grib2File);
                 gridcnt++;
             } else {
-                log.warning("Section " + nextsection.getSectionNumber() + " found while Section 7 expected. aborting.");
+                log.warning("Section " + sectionNumber + " found while Section 7 expected. aborting.");
                 return false;
             }
             // End import of data if a Section 7 does not contain any data
-            if ( section7[gridcnt - 1].getSectionLength() == 5 ) { finalizeImport(gribFile1); }
+            if ( section7[gridcnt - 1].getSectionLength() == 5 ) { finalizeImport(grib2File); }
         }
 
         return true;
@@ -60,16 +58,16 @@ public class StreamedGribFile extends Grib2File {
      * by the data
      */
     public float nextValue() throws IOException {
-        int gridIdx = 0;
-        GribSection5 sec5 = getSection5(gridIdx);
-        float val = 0;
+        int          gridIdx = 0;
+        GribSection5 sec5    = getSection5(gridIdx);
+        float        val     = 0;
         if ( sec5.getDataRepresentationTemplateNumber() == 0 ) {
             // Get the resolution of the data (number of bytes per value)
             DataRepresentationTemplate50 dataRepresentation = (DataRepresentationTemplate50) sec5.getDataRepresentationTemplate();
             int                          bytesperval        = dataRepresentation.getNumberBits() / 8;
             // Read data from data stream
             byte[] data = new byte[bytesperval];
-            gribFile.read(data);
+            grib2File.read(data);
 
             // Determine the value represented by the data
             short unsignedDraw = ByteBuffer.wrap(data).getShort();

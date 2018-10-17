@@ -11,7 +11,7 @@ public class GribSection6 extends GribSection {
     /**
      * Content and structure of a Section 6
      */
-    private byte   bitMapIndicator;
+    private short  bitMapIndicator;
     private byte[] bitMap;
 
 
@@ -34,17 +34,17 @@ public class GribSection6 extends GribSection {
         ByteBuffer byteBuffer = ByteBuffer.wrap(getSectionData());
 
         // Parse section and extract data
-        bitMapIndicator = byteBuffer.get();
+        bitMapIndicator = (short) Byte.toUnsignedInt(byteBuffer.get());
 
         bitMap = new byte[getSectionLength() - 6];
         byteBuffer.get(bitMap);
     }
 
-    public byte getBitMapIndicator() {
+    public short getBitMapIndicator() {
         return bitMapIndicator;
     }
 
-    public void setBitMapIndicator(byte bitMapIndicator) {
+    public void setBitMapIndicator(short bitMapIndicator) {
         this.bitMapIndicator = bitMapIndicator;
     }
 

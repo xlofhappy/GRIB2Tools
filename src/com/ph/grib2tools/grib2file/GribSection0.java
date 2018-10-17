@@ -16,10 +16,11 @@ public class GribSection0 implements Serializable {
      * Content and structure of a Section 0
      */
     private byte[] magicNumberBytes = new byte[4];
+    private String name;
     private short  reserved;
     private short  discipline;
     private String disciplineName;
-    private byte   number;
+    private int    editionNumber;
     private long   totalLength;
 
 
@@ -32,10 +33,11 @@ public class GribSection0 implements Serializable {
 
             // Parse section and extract data
             byteBuffer.get(magicNumberBytes);
+            name = new String(magicNumberBytes);
             reserved = byteBuffer.getShort();
             discipline = (short) Byte.toUnsignedInt(byteBuffer.get());
             disciplineName = chooseDisciplineName(discipline);
-            number = byteBuffer.get();
+            editionNumber = Byte.toUnsignedInt(byteBuffer.get());
             totalLength = byteBuffer.getLong();
         } catch ( Exception e ) {
             e.printStackTrace();
@@ -48,7 +50,7 @@ public class GribSection0 implements Serializable {
             gribFile.write(magicNumberBytes);
             dataOut.writeShort(reserved);
             gribFile.write(discipline);
-            gribFile.write(number);
+            gribFile.write(editionNumber);
             dataOut.writeLong(totalLength);
         } catch ( IOException e ) {
             e.printStackTrace();
@@ -85,7 +87,7 @@ public class GribSection0 implements Serializable {
 
     public boolean isGrib2File() {
         if ( isGribFile() ) {
-            return (number == 2);
+            return (editionNumber == 2);
         }
         return false;
     }
@@ -118,12 +120,20 @@ public class GribSection0 implements Serializable {
         this.discipline = discipline;
     }
 
-    public byte getNumber() {
-        return number;
+    public String getName() {
+        return name;
     }
 
-    public void setNumber(byte number) {
-        this.number = number;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getEditionNumber() {
+        return editionNumber;
+    }
+
+    public void setEditionNumber(int editionNumber) {
+        this.editionNumber = editionNumber;
     }
 
     public long getTotalLength() {

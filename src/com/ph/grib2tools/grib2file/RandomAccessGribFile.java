@@ -31,8 +31,8 @@ public class RandomAccessGribFile extends Grib2File {
         // within a stream or a file can be skipped
         for ( int t = 0; t < numSkip + 1; t++ ) {
             gridcnt = 0;
-            //while (true) {
-            while ( gridcnt < 1 ) {
+            while (true) {
+//            while ( gridcnt < 1 ) {
                 // Read all meta data but not the data itself in Section 7
                 importMetadataFromStream(grib2File);
                 // Read the data of Section 7 into memory
@@ -44,7 +44,7 @@ public class RandomAccessGribFile extends Grib2File {
                     gridcnt++;
                 } else {
                     log.warning("Section " + sectionNumber + " found while Section 7 expected. aborting.");
-                    return;
+                    break;
                 }
             }
             finalizeImport(grib2File);

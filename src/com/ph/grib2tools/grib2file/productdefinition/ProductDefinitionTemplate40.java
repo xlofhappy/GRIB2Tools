@@ -4,65 +4,186 @@ import java.nio.ByteBuffer;
 
 public class ProductDefinitionTemplate40 extends ProductDefinitionTemplate4x {
 
-    private static final long serialVersionUID = 100L;
-
-    private byte  parameterCategory;
-    private byte  parameterNumber;
-    private byte  typeOfGeneratingProcess;
-    private byte  backgroundGeneratingProcessId;
-    private byte  analysisOrForecastGeneratingProcessId;
-    private short hoursObservationalDataCutOff;
-    private byte  minutesObservationalDataCutOff;
-    private byte  unitTimeRange;
-    private int   forecastTime;
-    private byte  typeFirstFixedSurface;
-    private byte  scaleFactorFirstFixedSurface;
-    private int   scaledValueFirstFixedSurface;
-    private byte  typeSecondFixedSurface;
-    private byte  scaleFactorSecondFixedSurface;
-    private int   scaledValueSecondFixedSurface;
+    private short  parameterCategory;
+    private String parameterCategoryName;
+    private short  parameterNumber;
+    private String parameterNumberName;
+    private short  typeOfGeneratingProcess;
+    private byte   backgroundGeneratingProcessId;
+    private byte   analysisOrForecastGeneratingProcessId;
+    private short  hoursObservationalDataCutOff;
+    private byte   minutesObservationalDataCutOff;
+    private short  unitTimeRange;
+    private int    forecastTime;
+    private short  typeFirstFixedSurface;
+    private byte   scaleFactorFirstFixedSurface;
+    private int    scaledValueFirstFixedSurface;
+    private short  typeSecondFixedSurface;
+    private byte   scaleFactorSecondFixedSurface;
+    private int    scaledValueSecondFixedSurface;
 
 
     public ProductDefinitionTemplate40(ByteBuffer byteBuffer) {
-
-        parameterCategory = byteBuffer.get();
+        // 10
+        parameterCategory = (short) Byte.toUnsignedInt(byteBuffer.get());
+        parameterCategoryName = chooseParameterCategoryName(parameterCategory);
+        // 11
         parameterNumber = byteBuffer.get();
-        typeOfGeneratingProcess = byteBuffer.get();
+        // 12
+        typeOfGeneratingProcess = (short) Byte.toUnsignedInt(byteBuffer.get());
+        // 13
         backgroundGeneratingProcessId = byteBuffer.get();
+        // 14
         analysisOrForecastGeneratingProcessId = byteBuffer.get();
+        // 15-16
         hoursObservationalDataCutOff = byteBuffer.getShort();
+        // 17
         minutesObservationalDataCutOff = byteBuffer.get();
-        unitTimeRange = byteBuffer.get();
+        // 18
+        unitTimeRange = (short) Byte.toUnsignedInt(byteBuffer.get());
+        // 19-22
         forecastTime = byteBuffer.getInt();
-        typeFirstFixedSurface = byteBuffer.get();
+        // 23
+        typeFirstFixedSurface = (short) Byte.toUnsignedInt(byteBuffer.get());
+        // 24
         scaleFactorFirstFixedSurface = byteBuffer.get();
+        // 25-28
         scaledValueFirstFixedSurface = byteBuffer.getInt();
-        typeSecondFixedSurface = byteBuffer.get();
+        // 29
+        typeSecondFixedSurface = (short) Byte.toUnsignedInt(byteBuffer.get());
+        // 30
         scaleFactorSecondFixedSurface = byteBuffer.get();
+        // 31-34
         scaledValueSecondFixedSurface = byteBuffer.getInt();
     }
 
-    public byte getParameterCategory() {
+    /**
+     * TODO should be different based Product discipline
+     *
+     * @param parameterCategory
+     */
+    private String chooseParameterCategoryName(short parameterCategory) {
+        String name;
+        switch ( parameterCategory ) {
+            case 0:
+                name = "Temperature";
+                break;
+            case 1:
+                name = "Moisture";
+                break;
+            case 2:
+                name = "Momentum";
+                break;
+            case 3:
+                name = "Mass";
+                break;
+            case 4:
+                name = "Short-wave radiation";
+                break;
+            case 5:
+                name = "Long-wave radiation";
+                break;
+            case 6:
+                name = "Cloud";
+                break;
+            case 7:
+                name = "Thermodynamic Stability indicies";
+                break;
+            case 8:
+                name = "Kinematic Stability indicies";
+                break;
+            case 9:
+                name = "Temperature Probabilities*";
+                break;
+            case 10:
+                name = "Moisture Probabilities*";
+                break;
+            case 11:
+                name = "Momentum Probabilities*";
+                break;
+            case 12:
+                name = "Mass Probabilities*";
+                break;
+            case 13:
+                name = "Aerosols";
+                break;
+            case 14:
+                name = "Trace gases (e.g. Ozone, CO2)";
+                break;
+            case 15:
+                name = "Radar";
+                break;
+            case 16:
+                name = "Forecast Radar Imagery";
+                break;
+            case 17:
+                name = "Electrodynamics";
+                break;
+            case 18:
+                name = "Nuclear/radiology";
+                break;
+            case 19:
+                name = "Physical atmospheric properties";
+                break;
+            case 20:
+                name = "Atmospheric chemical Constituents";
+                break;
+            case 190:
+                name = "CCITT IA5 string";
+                break;
+            case 191:
+                name = "Miscellaneous ";
+                break;
+            case 192:
+                name = "Covariance";
+                break;
+            case 255:
+                name = "Missing";
+                break;
+            default:
+                name = "Reserved for Local Use";
+                break;
+        }
+        return name;
+    }
+
+    public short getParameterCategory() {
         return parameterCategory;
     }
 
-    public void setParameterCategory(byte parameterCategory) {
+    public void setParameterCategory(short parameterCategory) {
         this.parameterCategory = parameterCategory;
     }
 
-    public byte getParameterNumber() {
+    public String getParameterCategoryName() {
+        return parameterCategoryName;
+    }
+
+    public void setParameterCategoryName(String parameterCategoryName) {
+        this.parameterCategoryName = parameterCategoryName;
+    }
+
+    public short getParameterNumber() {
         return parameterNumber;
     }
 
-    public void setParameterNumber(byte parameterNumber) {
+    public void setParameterNumber(short parameterNumber) {
         this.parameterNumber = parameterNumber;
     }
 
-    public byte getTypeOfGeneratingProcess() {
+    public String getParameterNumberName() {
+        return parameterNumberName;
+    }
+
+    public void setParameterNumberName(String parameterNumberName) {
+        this.parameterNumberName = parameterNumberName;
+    }
+
+    public short getTypeOfGeneratingProcess() {
         return typeOfGeneratingProcess;
     }
 
-    public void setTypeOfGeneratingProcess(byte typeOfGeneratingProcess) {
+    public void setTypeOfGeneratingProcess(short typeOfGeneratingProcess) {
         this.typeOfGeneratingProcess = typeOfGeneratingProcess;
     }
 
@@ -98,11 +219,11 @@ public class ProductDefinitionTemplate40 extends ProductDefinitionTemplate4x {
         this.minutesObservationalDataCutOff = minutesObservationalDataCutOff;
     }
 
-    public byte getUnitTimeRange() {
+    public short getUnitTimeRange() {
         return unitTimeRange;
     }
 
-    public void setUnitTimeRange(byte unitTimeRange) {
+    public void setUnitTimeRange(short unitTimeRange) {
         this.unitTimeRange = unitTimeRange;
     }
 
@@ -114,11 +235,11 @@ public class ProductDefinitionTemplate40 extends ProductDefinitionTemplate4x {
         this.forecastTime = forecastTime;
     }
 
-    public byte getTypeFirstFixedSurface() {
+    public short getTypeFirstFixedSurface() {
         return typeFirstFixedSurface;
     }
 
-    public void setTypeFirstFixedSurface(byte typeFirstFixedSurface) {
+    public void setTypeFirstFixedSurface(short typeFirstFixedSurface) {
         this.typeFirstFixedSurface = typeFirstFixedSurface;
     }
 
@@ -138,11 +259,11 @@ public class ProductDefinitionTemplate40 extends ProductDefinitionTemplate4x {
         this.scaledValueFirstFixedSurface = scaledValueFirstFixedSurface;
     }
 
-    public byte getTypeSecondFixedSurface() {
+    public short getTypeSecondFixedSurface() {
         return typeSecondFixedSurface;
     }
 
-    public void setTypeSecondFixedSurface(byte typeSecondFixedSurface) {
+    public void setTypeSecondFixedSurface(short typeSecondFixedSurface) {
         this.typeSecondFixedSurface = typeSecondFixedSurface;
     }
 
