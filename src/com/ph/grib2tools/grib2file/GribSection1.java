@@ -1,7 +1,7 @@
 package com.ph.grib2tools.grib2file;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 public class GribSection1 extends GribSection {
@@ -11,42 +11,35 @@ public class GribSection1 extends GribSection {
     /**
      * Content and structure of a Section 1
      */
-    public short generatingCentre;
-    public short generatingSubcentre;
-    public byte  masterTablesVersion;
-    public byte  localTablesVersion;
-    public byte  significanceOfReferenceTime;
-    public short year;
-    public byte  month;
-    public byte  day;
-    public byte  hour;
-    public byte  minute;
-    public byte  second;
-    public byte  productionStatus;
-    public byte  type;
+    private short generatingCentre;
+    private short generatingSubCenter;
+    private byte  masterTablesVersion;
+    private byte  localTablesVersion;
+    private byte  significanceOfReferenceTime;
+    private short year;
+    private byte  month;
+    private byte  day;
+    private byte  hour;
+    private byte  minute;
+    private byte  second;
+    private byte  productionStatus;
+    private byte  type;
 
-
-    public GribSection1(InputStream gribFile) throws IOException {
+    public GribSection1(RandomAccessFile gribFile) throws IOException {
         super(gribFile);
     }
 
-    public GribSection1(GribSection gribSection) {
-        super(gribSection.getSectionLength(), gribSection.getSectionNumber(), gribSection.getSectionData());
-    }
-
     @Override
-    public void readData(InputStream gribFile) throws IOException {
+    public void readData(RandomAccessFile gribFile) throws IOException {
         super.readData(gribFile);
         readSection();
     }
 
     private void readSection() {
-
         ByteBuffer byteBuffer = ByteBuffer.wrap(getSectionData());
-
         // Parse section and extract data
         generatingCentre = byteBuffer.getShort();
-        generatingSubcentre = byteBuffer.getShort();
+        generatingSubCenter = byteBuffer.getShort();
         masterTablesVersion = byteBuffer.get();
         localTablesVersion = byteBuffer.get();
         significanceOfReferenceTime = byteBuffer.get();
@@ -58,5 +51,109 @@ public class GribSection1 extends GribSection {
         second = byteBuffer.get();
         productionStatus = byteBuffer.get();
         type = byteBuffer.get();
+    }
+
+    public short getGeneratingCentre() {
+        return generatingCentre;
+    }
+
+    public void setGeneratingCentre(short generatingCentre) {
+        this.generatingCentre = generatingCentre;
+    }
+
+    public short getGeneratingSubCenter() {
+        return generatingSubCenter;
+    }
+
+    public void setGeneratingSubCenter(short generatingSubCenter) {
+        this.generatingSubCenter = generatingSubCenter;
+    }
+
+    public byte getMasterTablesVersion() {
+        return masterTablesVersion;
+    }
+
+    public void setMasterTablesVersion(byte masterTablesVersion) {
+        this.masterTablesVersion = masterTablesVersion;
+    }
+
+    public byte getLocalTablesVersion() {
+        return localTablesVersion;
+    }
+
+    public void setLocalTablesVersion(byte localTablesVersion) {
+        this.localTablesVersion = localTablesVersion;
+    }
+
+    public byte getSignificanceOfReferenceTime() {
+        return significanceOfReferenceTime;
+    }
+
+    public void setSignificanceOfReferenceTime(byte significanceOfReferenceTime) {
+        this.significanceOfReferenceTime = significanceOfReferenceTime;
+    }
+
+    public short getYear() {
+        return year;
+    }
+
+    public void setYear(short year) {
+        this.year = year;
+    }
+
+    public byte getMonth() {
+        return month;
+    }
+
+    public void setMonth(byte month) {
+        this.month = month;
+    }
+
+    public byte getDay() {
+        return day;
+    }
+
+    public void setDay(byte day) {
+        this.day = day;
+    }
+
+    public byte getHour() {
+        return hour;
+    }
+
+    public void setHour(byte hour) {
+        this.hour = hour;
+    }
+
+    public byte getMinute() {
+        return minute;
+    }
+
+    public void setMinute(byte minute) {
+        this.minute = minute;
+    }
+
+    public byte getSecond() {
+        return second;
+    }
+
+    public void setSecond(byte second) {
+        this.second = second;
+    }
+
+    public byte getProductionStatus() {
+        return productionStatus;
+    }
+
+    public void setProductionStatus(byte productionStatus) {
+        this.productionStatus = productionStatus;
+    }
+
+    public byte getType() {
+        return type;
+    }
+
+    public void setType(byte type) {
+        this.type = type;
     }
 }

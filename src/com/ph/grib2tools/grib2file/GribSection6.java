@@ -1,7 +1,7 @@
 package com.ph.grib2tools.grib2file;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 public class GribSection6 extends GribSection {
@@ -15,8 +15,8 @@ public class GribSection6 extends GribSection {
     private byte[] bitMap;
 
 
-    public GribSection6(InputStream gribfile) throws IOException {
-        super(gribfile);
+    public GribSection6(RandomAccessFile grib2File) throws IOException {
+        super(grib2File);
     }
 
     public GribSection6(GribSection gribSection) {
@@ -24,8 +24,8 @@ public class GribSection6 extends GribSection {
     }
 
     @Override
-    public void readData(InputStream gribfile) throws IOException {
-        super.readData(gribfile);
+    public void readData(RandomAccessFile grib2File) throws IOException {
+        super.readData(grib2File);
         readSection();
     }
 

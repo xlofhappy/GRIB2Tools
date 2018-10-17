@@ -1,26 +1,24 @@
 package com.ph.grib2tools.test;
 
-import com.ph.grib2tools.grib2file.GribFile;
+import com.ph.grib2tools.grib2file.Grib2File;
 import com.ph.grib2tools.grib2file.GribSection1;
 import com.ph.grib2tools.grib2file.RandomAccessGribFile;
 import com.ph.grib2tools.grib2file.griddefinition.GridDefinitionTemplate30;
 import com.ph.grib2tools.grib2file.productdefinition.ProductDefinitionTemplate40;
 
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.RandomAccessFile;
 
 public class GRIB2FileTest {
 
     public static void main(String[] args) {
 
-//        if ( args.length < 1 ) {
-//            System.out.println("Syntax: java GRIB2FileTest <filename> <structureid (optional)>");
-//            return;
-//        }
+        //        if ( args.length < 1 ) {
+        //            System.out.println("Syntax: java GRIB2FileTest <filename> <structureid (optional)>");
+        //            return;
+        //        }
 
         // Name of the GRIB2 file
-//        String filename = args[0];
+        //        String filename = args[0];
         String filename = "/Users/xiaole/gfs.t18z.pgrb2.1p00.f000.grb";
 
         // Defines how many GRIB file structures shall be skipped when reading the GRIB2 file. This
@@ -32,23 +30,22 @@ public class GRIB2FileTest {
             numskip = 0;
         }
 
-        // Id of the grid within the GRIBF2 file, since GRIB2 files can contain several grids (Sections 5-7)
+        // Id of the grid within the GRIB2 file, since GRIB2 files can contain several grids (Sections 5-7)
         int gridid = 0;
 
         System.out.println("Reading file " + filename + ", file structure " + numskip + ":");
         try {
 
             // Open GRIB2 file and read it
-            InputStream inputstream;
-            inputstream = Files.newInputStream(Paths.get(filename));
-            RandomAccessGribFile gribFile = new RandomAccessGribFile("testdata", filename);
-            gribFile.importFromStream(inputstream, numskip);
+            RandomAccessFile     grib2File   = new RandomAccessFile(filename, "r");
+            RandomAccessGribFile gribFile    = new RandomAccessGribFile("testdata", filename);
+            gribFile.importFromStream(grib2File, numskip);
 
             // Get identification information
             GribSection1 section1 = gribFile.getSection1();
-            System.out.println("Date: " + String.format("%02d", section1.day) + "." + String.format("%02d", section1.month) + "." + section1.year);
-            System.out.println("Time: " + String.format("%02d", section1.hour) + ":" + String.format("%02d", section1.minute) + "." + String.format("%02d", section1.second));
-            System.out.println("Generating centre: " + section1.generatingCentre);
+            System.out.println("Date: " + String.format("%02d", section1.getDay()) + "." + String.format("%02d", section1.getMonth()) + "." + section1.getYear());
+            System.out.println("Time: " + String.format("%02d", section1.getHour()) + ":" + String.format("%02d", section1.getMinute()) + "." + String.format("%02d", section1.getSecond()));
+            System.out.println("Generating centre: " + section1.getGeneratingCentre());
             // Get product information
             ProductDefinitionTemplate40 productDefinition = (ProductDefinitionTemplate40) gribFile.getProductDefinitionTemplate();
             System.out.println("Forecast time: " + productDefinition.getForecastTime());
@@ -58,12 +55,12 @@ public class GRIB2FileTest {
             // Get grid information
             GridDefinitionTemplate30 gridDefinition = (GridDefinitionTemplate30) gribFile.getGridDefinitionTemplate();
             System.out.println("Covered area:");
-            System.out.println("   from (latitude, longitude): " + GribFile.unitsToDeg(gridDefinition.getFirstPointLat()) + ", " + GribFile.unitsToDeg(gridDefinition.getFirstPointLon()));
-            System.out.println("   to: (latitude, longitude): " + GribFile.unitsToDeg(gridDefinition.getLastPointLat()) + ", " + GribFile.unitsToDeg(gridDefinition.getLastPointLon()));
+            System.out.println("   from (latitude, longitude): " + Grib2File.unitsToDeg(gridDefinition.getFirstPointLat()) + ", " + Grib2File.unitsToDeg(gridDefinition.getFirstPointLon()));
+            System.out.println("   to: (latitude, longitude): " + Grib2File.unitsToDeg(gridDefinition.getLastPointLat()) + ", " + Grib2File.unitsToDeg(gridDefinition.getLastPointLon()));
 
 
             for ( int i : gribFile.getSection7(0).getData().getVariablePart() ) {
-                System.out.println(i+ " \t " +gribFile.getSection7(0).getData().getVariablePart()[i]);
+                System.out.println(i + " \t " + gribFile.getSection7(0).getData().getVariablePart()[i]);
             }
             // Get grid data
             double latitude  = 1;

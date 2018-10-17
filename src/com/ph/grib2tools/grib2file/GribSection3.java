@@ -4,7 +4,7 @@ import com.ph.grib2tools.grib2file.griddefinition.GridDefinitionTemplate30;
 import com.ph.grib2tools.grib2file.griddefinition.GridDefinitionTemplate3x;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 public class GribSection3 extends GribSection {
@@ -22,7 +22,7 @@ public class GribSection3 extends GribSection {
     private GridDefinitionTemplate3x gridDefinitionTemplate;
     private byte[]                   optionalListOfPoints;
 
-    public GribSection3(InputStream gribFile) throws IOException {
+    public GribSection3(RandomAccessFile gribFile) throws IOException {
         super(gribFile);
     }
 
@@ -31,7 +31,7 @@ public class GribSection3 extends GribSection {
     }
 
     @Override
-    public void readData(InputStream gribFile) throws IOException {
+    public void readData(RandomAccessFile gribFile) throws IOException {
         super.readData(gribFile);
         readSection();
     }

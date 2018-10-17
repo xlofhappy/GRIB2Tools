@@ -1,10 +1,6 @@
 package com.ph.grib2tools.grib2file;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.ByteBuffer;
 
 public class GribSection0 implements Serializable {
@@ -21,29 +17,27 @@ public class GribSection0 implements Serializable {
      */
     private byte[] magicNumberBytes = new byte[4];
     private short  reserved;
-    private byte   discipline;
+    private short  discipline;
+    private String disciplineName;
     private byte   number;
     private long   totalLength;
 
 
-    public GribSection0(InputStream gribfile) {
-
+    public GribSection0(RandomAccessFile gribFile) {
         try {
-
             // Read complete section
             byte[] section0 = new byte[16];
-            gribfile.read(section0);
+            gribFile.read(section0);
             ByteBuffer byteBuffer = ByteBuffer.wrap(section0);
 
             // Parse section and extract data
             byteBuffer.get(magicNumberBytes);
             reserved = byteBuffer.getShort();
-            discipline = byteBuffer.get();
+            discipline = (short) Byte.toUnsignedInt(byteBuffer.get());
+            disciplineName = chooseDisciplineName(discipline);
             number = byteBuffer.get();
             totalLength = byteBuffer.getLong();
-
         } catch ( Exception e ) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -61,12 +55,39 @@ public class GribSection0 implements Serializable {
         }
     }
 
-    public boolean verifyMagicNumber() {
+    private String chooseDisciplineName(short discipline) {
+        String name;
+        if ( discipline == 0 ) {
+            name = "Meteorological Products";
+        } else if ( discipline == 1 ) {
+            name = "Hydrological Products";
+        } else if ( discipline == 2 ) {
+            name = "Land Surface Products";
+        } else if ( discipline == 3 || discipline == 4 ) {
+            name = "Space Products";
+        } else if ( discipline >= 5 && discipline <= 9 ) {
+            name = "Reserved";
+        } else if ( discipline == 10 ) {
+            name = "Oceanographic Products";
+        } else if ( discipline >= 11 && discipline <= 191 ) {
+            name = "Reserved";
+        } else if ( discipline >= 192 && discipline <= 254 ) {
+            name = "Reserved for Local Use";
+        } else {
+            name = "Missing";
+        }
+        return name;
+    }
+
+    private boolean isGribFile() {
         return (ByteBuffer.wrap(magicNumberBytes).compareTo(ByteBuffer.wrap(GRIB_MAGIC_NUMBER)) == 0);
     }
 
-    public boolean verifyGribVersion() {
-        return (number == 2);
+    public boolean isGrib2File() {
+        if ( isGribFile() ) {
+            return (number == 2);
+        }
+        return false;
     }
 
     public static byte[] getGRIBMAGICNUMBER() {
@@ -89,11 +110,11 @@ public class GribSection0 implements Serializable {
         this.reserved = reserved;
     }
 
-    public byte getDiscipline() {
+    public short getDiscipline() {
         return discipline;
     }
 
-    public void setDiscipline(byte discipline) {
+    public void setDiscipline(short discipline) {
         this.discipline = discipline;
     }
 
@@ -113,4 +134,11 @@ public class GribSection0 implements Serializable {
         this.totalLength = totalLength;
     }
 
+    public String getDisciplineName() {
+        return disciplineName;
+    }
+
+    public void setDisciplineName(String disciplineName) {
+        this.disciplineName = disciplineName;
+    }
 }

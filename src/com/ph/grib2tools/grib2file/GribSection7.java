@@ -3,7 +3,7 @@ package com.ph.grib2tools.grib2file;
 import com.ph.grib2tools.grib2file.datarepresentation.*;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 public class GribSection7 extends GribSection {
@@ -18,8 +18,8 @@ public class GribSection7 extends GribSection {
         super(len, num, data);
     }
 
-    public GribSection7(InputStream gribfile) throws IOException {
-        super(gribfile);
+    public GribSection7(RandomAccessFile grib2File) throws IOException {
+        super(grib2File);
     }
 
     public GribSection7(GribSection gribSection) {
@@ -27,8 +27,8 @@ public class GribSection7 extends GribSection {
     }
 
     @Override
-    public void readData(InputStream gribfile) throws IOException {
-        super.readData(gribfile);
+    public void readData(RandomAccessFile grib2File) throws IOException {
+        super.readData(grib2File);
         readSection();
     }
 

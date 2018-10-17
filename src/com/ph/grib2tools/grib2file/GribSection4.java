@@ -5,7 +5,7 @@ import com.ph.grib2tools.grib2file.productdefinition.ProductDefinitionTemplate48
 import com.ph.grib2tools.grib2file.productdefinition.ProductDefinitionTemplate4x;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 public class GribSection4 extends GribSection {
@@ -21,7 +21,7 @@ public class GribSection4 extends GribSection {
     private byte[]                      optionalListOfCoordinates;
 
 
-    public GribSection4(InputStream gribFile) throws IOException {
+    public GribSection4(RandomAccessFile gribFile) throws IOException {
         super(gribFile);
     }
 
@@ -30,7 +30,7 @@ public class GribSection4 extends GribSection {
     }
 
     @Override
-    public void readData(InputStream gribFile) throws IOException {
+    public void readData(RandomAccessFile gribFile) throws IOException {
         super.readData(gribFile);
         readSection();
     }

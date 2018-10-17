@@ -10,14 +10,16 @@ public class GribSection implements Serializable {
 
     private static final long serialVersionUID = 100L;
 
+    private static final int SECTION_HEADER_LENGTH = 5;
+
     /**
      * Length of the section
      */
-    private int sectionLength;
+    private int    sectionLength;
     /**
      * Section number
      */
-    private byte sectionNumber;
+    private byte   sectionNumber;
     /**
      * Data of the section
      */
@@ -30,11 +32,11 @@ public class GribSection implements Serializable {
         sectionData = data;
     }
 
-    public GribSection(InputStream gribFile) throws IOException {
+    public GribSection(RandomAccessFile grib2File) throws IOException {
         // All Sections of type 1 to 7 begin with a five byte long header. This header consists of a four byte
         // long length of the section, followed by a one byte section number (type)
-        byte[] sectionHeader = new byte[5];
-        gribFile.read(sectionHeader);
+        byte[] sectionHeader = new byte[SECTION_HEADER_LENGTH];
+        grib2File.read(sectionHeader);
         ByteBuffer byteBuffer = ByteBuffer.wrap(sectionHeader);
 
         // Extract section length and section number (type) from the header
@@ -42,30 +44,9 @@ public class GribSection implements Serializable {
         sectionNumber = byteBuffer.get();
     }
 
-    public GribSection initSection() {
-        if ( sectionNumber == 1 ) {
-            return new GribSection1(this);
-        } else if ( sectionNumber == 2 ) {
-            return new GribSection2(this);
-        } else if ( sectionNumber == 3 ) {
-            return new GribSection3(this);
-        } else if ( sectionNumber == 4 ) {
-            return new GribSection4(this);
-        } else if ( sectionNumber == 5 ) {
-            return new GribSection5(this);
-        } else if ( sectionNumber == 6 ) {
-            return new GribSection6(this);
-        } else if ( sectionNumber == 7 ) {
-            return new GribSection7(this);
-        } else {
-            System.out.println("Section Number " + sectionNumber + " not implemented");
-        }
-        return null;
-    }
-
-    public void readData(InputStream gribFile) throws IOException {
+    public void readData(RandomAccessFile gribFile) throws IOException {
         // Read complete section
-        sectionData = new byte[sectionLength - 5];
+        sectionData = new byte[sectionLength - SECTION_HEADER_LENGTH];
         gribFile.read(sectionData);
     }
 
@@ -77,15 +58,27 @@ public class GribSection implements Serializable {
     }
 
     /**
-     * Adjust a one byte value extracted from a GRIB file according to the GRIB specification to obtain
+     * Adjust a one byte value extracted from a GRIB2 file according to the GRIB specification to obtain
      * a correct unsigned byte
      */
-    public static short adjustUnsignedByte(int unsignedbyte) {
-        return (short) ((unsignedbyte & 0x7F) + (unsignedbyte & 0x80));
+    public static short sectionNumber(RandomAccessFile grib2File) throws IOException {
+        byte[] sectionHeader = new byte[SECTION_HEADER_LENGTH];
+        grib2File.read(sectionHeader);
+        ByteBuffer byteBuffer = ByteBuffer.wrap(sectionHeader);
+        grib2File.seek(grib2File.getFilePointer() - SECTION_HEADER_LENGTH);
+        return byteBuffer.get(SECTION_HEADER_LENGTH - 1);
     }
 
     /**
-     * Adjust a two byte value extracted from a GRIB file according to the GRIB specification to obtain
+     * Adjust a one byte value extracted from a GRIB2 file according to the GRIB specification to obtain
+     * a correct unsigned byte
+     */
+    public static short adjustUnsignedByte(int unSignedByte) {
+        return (short) ((unSignedByte & 0x7F) + (unSignedByte & 0x80));
+    }
+
+    /**
+     * Adjust a two byte value extracted from a GRIB2 file according to the GRIB specification to obtain
      * a correct unsigned short
      **/
     public static int adjustUnsignedShort(int unsignedshort) {
@@ -93,7 +86,7 @@ public class GribSection implements Serializable {
     }
 
     /**
-     * Adjust a four byte value extracted from a GRIB file according to the GRIB specification to obtain
+     * Adjust a four byte value extracted from a GRIB2 file according to the GRIB specification to obtain
      * a correct unsigned int
      */
     public static long adjustUnsignedInt(int unsignedint) {
@@ -101,7 +94,7 @@ public class GribSection implements Serializable {
     }
 
     /**
-     * Convert a one byte value extracted from a GRIB file according to the GRIB specification to recover
+     * Convert a one byte value extracted from a GRIB2 file according to the GRIB specification to recover
      * the sign of a signed one
      */
     public static byte correctNegativeByte(byte unCorrectedValue) {
@@ -112,7 +105,7 @@ public class GribSection implements Serializable {
     }
 
     /**
-     * Convert a two byte value extracted from a GRIB file according to the GRIB specification to recover
+     * Convert a two byte value extracted from a GRIB2 file according to the GRIB specification to recover
      * the sign of a signed short
      */
     public static short correctNegativeShort(short unCorrectedValue) {
@@ -122,7 +115,7 @@ public class GribSection implements Serializable {
     }
 
     /**
-     * Convert a four byte value extracted from a GRIB file according to the GRIB specification to recover
+     * Convert a four byte value extracted from a GRIB2 file according to the GRIB specification to recover
      * the sign of a signed int
      */
     public static int correctNegativeInt(int unCorrectedValue) {

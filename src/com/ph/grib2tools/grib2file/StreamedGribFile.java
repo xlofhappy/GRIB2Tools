@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  * GRIB file that is streamed. As a consequence of the streaming, it is not possible
  * to access the data randomly.
  */
-public class StreamedGribFile extends GribFile {
+public class StreamedGribFile extends Grib2File {
 
     private static final long serialVersionUID = 100L;
 
@@ -37,7 +37,7 @@ public class StreamedGribFile extends GribFile {
             gridcnt = 0;
 
             // Read all meta data but not the data itself in Section 7
-            importMetadatFromStream(gribFile);
+            importMetadataFromStream(gribFile);
 
             // Consider Section 7 but do not read its data into memory
             GribSection nextsection = new GribSection(gribFile).initSection();

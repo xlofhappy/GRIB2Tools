@@ -6,7 +6,7 @@ import com.ph.grib2tools.grib2file.datarepresentation.DataRepresentationTemplate
 import com.ph.grib2tools.grib2file.datarepresentation.DataRepresentationTemplate5x;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 public class GribSection5 extends GribSection {
@@ -21,7 +21,7 @@ public class GribSection5 extends GribSection {
     private DataRepresentationTemplate5x dataRepresentationTemplate;
 
 
-    public GribSection5(InputStream gribfile) throws IOException {
+    public GribSection5(RandomAccessFile gribfile) throws IOException {
         super(gribfile);
     }
 
@@ -30,7 +30,7 @@ public class GribSection5 extends GribSection {
     }
 
     @Override
-    public void readData(InputStream gribfile) throws IOException {
+    public void readData(RandomAccessFile gribfile) throws IOException {
         super.readData(gribfile);
         readSection();
     }

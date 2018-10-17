@@ -4,7 +4,7 @@ import com.ph.grib2tools.grib2file.datarepresentation.DataRepresentationTemplate
 import com.ph.grib2tools.grib2file.griddefinition.GridDefinitionTemplate30;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.logging.Logger;
 
@@ -13,42 +13,41 @@ import java.util.logging.Logger;
  * access to the data of the GRIB file. While the random access allows great flexibility
  * it requires that the complete data is held in memory
  **/
-public class RandomAccessGribFile extends GribFile {
+public class RandomAccessGribFile extends Grib2File {
 
     private static final long serialVersionUID = 100L;
 
     private static final Logger log = Logger.getLogger(RandomAccessGribFile.class.getName());
 
-
     public RandomAccessGribFile(String typeId, String source) {
         super(typeId, source);
     }
 
-    public void importFromStream(InputStream gribFile, int numSkip) throws IOException {
-        if ( gribFile == null ) {
+    public void importFromStream(RandomAccessFile grib2File, int numSkip) throws IOException {
+        if ( grib2File == null ) {
             return;
         }
-        // By overwriting the section variables, the first numskip GRIB file data structures
+        // By overwriting the section variables, the first numSkip GRIB file data structures
         // within a stream or a file can be skipped
         for ( int t = 0; t < numSkip + 1; t++ ) {
             gridcnt = 0;
             //while (true) {
             while ( gridcnt < 1 ) {
                 // Read all meta data but not the data itself in Section 7
-                importMetadatFromStream(gribFile);
+                importMetadataFromStream(grib2File);
                 // Read the data of Section 7 into memory
-                GribSection nextSection = new GribSection(gribFile).initSection();
-                if ( nextSection.getSectionNumber() == 7 ) {
-                    section7[gridcnt] = (GribSection7) nextSection;
+                short sectionNumber = GribSection.sectionNumber(grib2File);
+                if ( sectionNumber == 7 ) {
+                    section7[gridcnt] = new GribSection7(grib2File);
                     section7[gridcnt].setDataRepresentation(section5[gridcnt].getNumberDataPoints(), section5[gridcnt].getDataRepresentationTemplate());
-                    section7[gridcnt].readData(gribFile);
+                    section7[gridcnt].readData(grib2File);
                     gridcnt++;
                 } else {
-                    log.warning("Section " + nextSection.getSectionNumber() + " found while Section 7 expected. aborting.");
+                    log.warning("Section " + sectionNumber + " found while Section 7 expected. aborting.");
                     return;
                 }
             }
-            finalizeImport(gribFile);
+            finalizeImport(grib2File);
         }
     }
 
@@ -59,7 +58,7 @@ public class RandomAccessGribFile extends GribFile {
      * is considered.
      */
     public float getValueAtLocation(int gridIdx, double lat, double lon) {
-        return getValueAt(gridIdx, GribFile.degToUnits(lat), GribFile.degToUnits(lon));
+        return getValueAt(gridIdx, Grib2File.degToUnits(lat), Grib2File.degToUnits(lon));
     }
 
     /**
@@ -71,17 +70,14 @@ public class RandomAccessGribFile extends GribFile {
     public float getValueAt(int gridIdx, int lat, int lon) {
         GribSection5 sec5 = getSection5(gridIdx);
         GribSection7 sec7 = getSection7(gridIdx);
-        float val = 0;
+        float        val  = 0;
         if ( sec5.getDataRepresentationTemplateNumber() == 0 ) {
             DataRepresentationTemplate50 dataRepresentation = (DataRepresentationTemplate50) sec5.getDataRepresentationTemplate();
             int                          bytesperval        = dataRepresentation.getNumberBits() / 8;
 
             if ( section3.getGridDefinitionTemplateNumber() == 0 ) {
-
                 GridDefinitionTemplate30 gridDefinition = (GridDefinitionTemplate30) section3.getGridDefinitionTemplate();
-
-                int deltaj = 0;
-
+                int                      deltaj         = 0;
                 // Implementation of Scanning Modes
                 if ( (gridDefinition.getScanningMode() & 0x01) == 0x01 ) {
                     log.warning("Scanning mode " + 0x01 + " not supported");
@@ -116,7 +112,7 @@ public class RandomAccessGribFile extends GribFile {
                 // Calculate i index of the matrix containing the data the contains the data of the
                 // passed longitude lon
                 int firstPointLon = gridDefinition.getFirstPointLon() + 0;
-                if ( firstPointLon >= GribFile.degToUnits(180) ) { firstPointLon -= GribFile.degToUnits(360); }
+                if ( firstPointLon >= Grib2File.degToUnits(180) ) { firstPointLon -= Grib2File.degToUnits(360); }
                 int deltalon = lon - firstPointLon;
                 int iidx     = Math.round((float) deltalon / (float) gridDefinition.getiDirectionIncrement());
 
@@ -141,7 +137,7 @@ public class RandomAccessGribFile extends GribFile {
      * to calculate the value belonging to the passed position.
      */
     public float interpolateValueAtLocation(int gridIdx, double lat, double lon) {
-        return interpolateValueAt(gridIdx, GribFile.degToUnits(lat), GribFile.degToUnits(lon));
+        return interpolateValueAt(gridIdx, Grib2File.degToUnits(lat), Grib2File.degToUnits(lon));
     }
 
     /**
@@ -153,13 +149,13 @@ public class RandomAccessGribFile extends GribFile {
     public float interpolateValueAt(int gridIdx, int lat, int lon) {
         GribSection5 sec5 = getSection5(gridIdx);
         GribSection7 sec7 = getSection7(gridIdx);
-        float val = 0;
+        float        val  = 0;
         if ( sec5.getDataRepresentationTemplateNumber() == 0 ) {
             DataRepresentationTemplate50 dataRepresentation = (DataRepresentationTemplate50) sec5.getDataRepresentationTemplate();
             int                          bytesperval        = dataRepresentation.getNumberBits() / 8;
             if ( section3.getGridDefinitionTemplateNumber() == 0 ) {
                 GridDefinitionTemplate30 gridDefinition = (GridDefinitionTemplate30) section3.getGridDefinitionTemplate();
-                int deltaj = 0;
+                int                      deltaj         = 0;
                 // Implementation of Scanning Modes
                 if ( (gridDefinition.getScanningMode() & 0x01) == 0x01 ) {
                     log.warning("Scanning mode " + 0x01 + " not supported");
@@ -200,7 +196,7 @@ public class RandomAccessGribFile extends GribFile {
                 // Find i indices of the grid points of the matrix containing the data that surround the
                 // passed longitude lon
                 int firstPointLon = gridDefinition.getFirstPointLon() + 0;
-                if ( firstPointLon >= GribFile.degToUnits(180) ) { firstPointLon -= GribFile.degToUnits(360); }
+                if ( firstPointLon >= Grib2File.degToUnits(180) ) { firstPointLon -= Grib2File.degToUnits(360); }
                 int deltalon = lon - firstPointLon;
                 //int iidx1 = Math.round((float)deltalon / (float)gridDefinition.iDirectionIncrement);
                 int iidx1 = (int) Math.floor((float) deltalon / (float) gridDefinition.getiDirectionIncrement());
