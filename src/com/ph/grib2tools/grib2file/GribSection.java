@@ -58,14 +58,23 @@ public class GribSection implements Serializable {
     }
 
     /**
-     * Adjust a one byte value extracted from a GRIB2 file according to the GRIB specification to obtain
-     * a correct unsigned byte
+     * get the section number
      */
     public static short sectionNumber(RandomAccessFile grib2File) throws IOException {
         byte[] sectionHeader = new byte[SECTION_HEADER_LENGTH];
         grib2File.read(sectionHeader);
         ByteBuffer byteBuffer = ByteBuffer.wrap(sectionHeader);
         grib2File.seek(grib2File.getFilePointer() - SECTION_HEADER_LENGTH);
+        return byteBuffer.get(SECTION_HEADER_LENGTH - 1);
+    }
+
+    /**
+     * get the section number
+     */
+    public static short isEnd(RandomAccessFile grib2File) throws IOException {
+        byte[] grib2End = new byte[4];
+        grib2File.read(grib2End);
+        ByteBuffer byteBuffer = ByteBuffer.wrap(grib2End);
         return byteBuffer.get(SECTION_HEADER_LENGTH - 1);
     }
 
