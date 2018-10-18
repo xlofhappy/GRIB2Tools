@@ -18,48 +18,63 @@ public class GridDefinitionTemplate30 extends GridDefinitionTemplate3x {
     private int    numberPointsLat;
     private int    basicAngle;
     private int    subdivisionsBasicAngle;
-    private int    firstPointLat;
-    private int    firstPointLon;
+    private float  firstPointLat;
+    private float  firstPointLon;
     private byte   resolutionAndComponentFlags;
-    private int    lastPointLat;
-    private int    lastPointLon;
+    private float  lastPointLat;
+    private float  lastPointLon;
     private int    iDirectionIncrement;
     private int    jDirectionIncrement;
     private byte   scanningMode;
 
 
     public GridDefinitionTemplate30(ByteBuffer byteBuffer) {
-
+        // 15
         shapeOfEarth = (short) Byte.toUnsignedInt(byteBuffer.get());
         shapeOfEarthName = chooseShapeOfEarthName(shapeOfEarth);
+        // 16
         scaleFactorRadiusSphericalEarth = byteBuffer.get();
+        // 17-20
         scaledValueRadiusSphericalEarth = byteBuffer.getInt();
+        // 21
         scaleFactorMajorAxisOblateSpheroidEarth = byteBuffer.get();
+        // 22-25
         scaledValueMajorAxisOblateSpheroidEarth = byteBuffer.getInt();
+        // 26
         scaleFactorMinorAxisOblateSpheroidEarth = byteBuffer.get();
+        // 27-30
         scaledValueMinorAxisOblateSpheroidEarth = byteBuffer.getInt();
+        // 31-34
         numberPointsLon = byteBuffer.getInt();
+        // 35-38
         numberPointsLat = byteBuffer.getInt();
+        // 39-42
         basicAngle = byteBuffer.getInt();
+        // 43-46
         subdivisionsBasicAngle = byteBuffer.getInt();
-        firstPointLat = GribSection.correctNegativeInt(byteBuffer.getInt());
-        firstPointLon = GribSection.correctNegativeInt(byteBuffer.getInt());
+        float rate;
+        if ( basicAngle == 0 ) {
+            rate = 1 / 1000000F;
+        } else {
+            rate = basicAngle * 1F / subdivisionsBasicAngle;
+        }
+        // 47-50
+        firstPointLat = byteBuffer.getInt() * rate;
+        // 51-54
+        firstPointLon = byteBuffer.getInt() * rate;
+        // 55
         resolutionAndComponentFlags = byteBuffer.get();
-        lastPointLat = GribSection.correctNegativeInt(byteBuffer.getInt());
-        lastPointLon = GribSection.correctNegativeInt(byteBuffer.getInt());
+        // 56-59
+        lastPointLat = byteBuffer.getInt() * rate;
+        // 60-63
+        lastPointLon = byteBuffer.getInt() * rate;
+        // 64-67
         iDirectionIncrement = GribSection.correctNegativeInt(byteBuffer.getInt());
+        // 68-71
         jDirectionIncrement = GribSection.correctNegativeInt(byteBuffer.getInt());
+        // 72
         scanningMode = byteBuffer.get();
-    }
 
-    /**
-     * Compares this GridDefinitionTemplate30 with the passed GridDefinitionTemplate30 other
-     *
-     * @param other {@link GridDefinitionTemplate30}
-     */
-    public boolean equals(GridDefinitionTemplate30 other) {
-        if ( other == null ) { return false; }
-        return (this.firstPointLat == other.firstPointLat) && (this.firstPointLon == other.firstPointLon) && (this.lastPointLat == other.lastPointLat) && (this.lastPointLon == other.lastPointLon) && (this.iDirectionIncrement == other.iDirectionIncrement) && (this.jDirectionIncrement == other.jDirectionIncrement) && (this.numberPointsLat == other.numberPointsLat) && (this.numberPointsLon == other.numberPointsLon);
     }
 
     private String chooseShapeOfEarthName(short shapeOfEarth) {
@@ -103,6 +118,14 @@ public class GridDefinitionTemplate30 extends GridDefinitionTemplate3x {
                 break;
         }
         return name;
+    }
+
+    public void setLastPointLat(float lastPointLat) {
+        this.lastPointLat = lastPointLat;
+    }
+
+    public void setLastPointLon(float lastPointLon) {
+        this.lastPointLon = lastPointLon;
     }
 
     public short getShapeOfEarth() {
@@ -201,19 +224,19 @@ public class GridDefinitionTemplate30 extends GridDefinitionTemplate3x {
         this.subdivisionsBasicAngle = subdivisionsBasicAngle;
     }
 
-    public int getFirstPointLat() {
+    public float getFirstPointLat() {
         return firstPointLat;
     }
 
-    public void setFirstPointLat(int firstPointLat) {
+    public void setFirstPointLat(float firstPointLat) {
         this.firstPointLat = firstPointLat;
     }
 
-    public int getFirstPointLon() {
+    public float getFirstPointLon() {
         return firstPointLon;
     }
 
-    public void setFirstPointLon(int firstPointLon) {
+    public void setFirstPointLon(float firstPointLon) {
         this.firstPointLon = firstPointLon;
     }
 
@@ -225,7 +248,7 @@ public class GridDefinitionTemplate30 extends GridDefinitionTemplate3x {
         this.resolutionAndComponentFlags = resolutionAndComponentFlags;
     }
 
-    public int getLastPointLat() {
+    public float getLastPointLat() {
         return lastPointLat;
     }
 
@@ -233,7 +256,7 @@ public class GridDefinitionTemplate30 extends GridDefinitionTemplate3x {
         this.lastPointLat = lastPointLat;
     }
 
-    public int getLastPointLon() {
+    public float getLastPointLon() {
         return lastPointLon;
     }
 

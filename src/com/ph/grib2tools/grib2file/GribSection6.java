@@ -15,14 +15,6 @@ public class GribSection6 extends GribSection {
     private byte[] bitMap;
 
 
-    public GribSection6(RandomAccessFile grib2File) throws IOException {
-        super(grib2File);
-    }
-
-    public GribSection6(GribSection gribSection) {
-        super(gribSection.getSectionLength(), gribSection.getSectionNumber(), gribSection.getSectionData());
-    }
-
     @Override
     public void readData(RandomAccessFile grib2File) throws IOException {
         super.readData(grib2File);
@@ -30,12 +22,9 @@ public class GribSection6 extends GribSection {
     }
 
     private void readSection() {
-
         ByteBuffer byteBuffer = ByteBuffer.wrap(getSectionData());
-
-        // Parse section and extract data
+        // 6
         bitMapIndicator = (short) Byte.toUnsignedInt(byteBuffer.get());
-
         bitMap = new byte[getSectionLength() - 6];
         byteBuffer.get(bitMap);
     }

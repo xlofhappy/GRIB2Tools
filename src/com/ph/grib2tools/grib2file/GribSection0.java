@@ -31,13 +31,17 @@ public class GribSection0 implements Serializable {
             gribFile.read(section0);
             ByteBuffer byteBuffer = ByteBuffer.wrap(section0);
 
-            // Parse section and extract data
+            // 1-4
             byteBuffer.get(magicNumberBytes);
             name = new String(magicNumberBytes);
+            // 5-6
             reserved = byteBuffer.getShort();
+            // 7
             discipline = (short) Byte.toUnsignedInt(byteBuffer.get());
             disciplineName = chooseDisciplineName(discipline);
+            // 8
             editionNumber = Byte.toUnsignedInt(byteBuffer.get());
+            // 9-16
             totalLength = byteBuffer.getLong();
         } catch ( Exception e ) {
             e.printStackTrace();

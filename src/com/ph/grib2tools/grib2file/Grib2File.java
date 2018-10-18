@@ -167,13 +167,13 @@ public class Grib2File implements Serializable {
         this.section7 = section7;
     }
 
-    public static int getLatIndex(GridDefinitionTemplate30 gridDefinition, double latitude) {
+    public static float getLatIndex(GridDefinitionTemplate30 gridDefinition, double latitude) {
         return (Grib2File.degToUnits(latitude) - gridDefinition.getFirstPointLat()) / gridDefinition.getjDirectionIncrement();
     }
 
-    public static int getLonIndex(GridDefinitionTemplate30 gridDefinition, double longitude) {
+    public static float getLonIndex(GridDefinitionTemplate30 gridDefinition, double longitude) {
         // Make sure that longitude is in a range from -180 to 180 degrees
-        int firstPointLon = gridDefinition.getFirstPointLon();
+        float firstPointLon = gridDefinition.getFirstPointLon();
         if ( firstPointLon >= Grib2File.degToUnits(180) ) { firstPointLon -= Grib2File.degToUnits(360); }
 
         return (Grib2File.degToUnits(longitude) - firstPointLon) / gridDefinition.getiDirectionIncrement();

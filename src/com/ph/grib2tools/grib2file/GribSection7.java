@@ -1,76 +1,40 @@
 package com.ph.grib2tools.grib2file;
 
-import com.ph.grib2tools.grib2file.datarepresentation.*;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 
 public class GribSection7 extends GribSection {
 
-    private static final long serialVersionUID = 200L;
-
-    private int                          numberDataPoints;
-    private DataRepresentationTemplate5x dataRepresentation;
-    private DataSection7x                data;
-
-    public GribSection7(int len, byte num, byte[] data) {
-        super(len, num, data);
-    }
-
-    public GribSection7(RandomAccessFile grib2File) throws IOException {
-        super(grib2File);
-    }
-
-    public GribSection7(GribSection gribSection) {
-        super(gribSection.getSectionLength(), gribSection.getSectionNumber(), gribSection.getSectionData());
-    }
+    /**
+     * record the data's start position in the GRIB2 File
+     */
+    private long startPosition;
+    /**
+     * record the data's end position in the GRIB2 File
+     */
+    private long endPosition;
 
     @Override
     public void readData(RandomAccessFile grib2File) throws IOException {
-        super.readData(grib2File);
-        readSection();
+        super.readSectionHeader(grib2File);
+        startPosition = grib2File.getFilePointer() - SECTION_HEADER_LENGTH;
+        endPosition = grib2File.getFilePointer() + getSectionLength() - SECTION_HEADER_LENGTH;
+        grib2File.seek(endPosition);
     }
 
-    public void readSection() {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(getSectionData());
-        if ( dataRepresentation.getClass().equals(DataRepresentationTemplate50.class) ) {
-            /* Nothing to do */
-        } else if ( dataRepresentation.getClass().equals(DataRepresentationTemplate52.class) ) {
-            data = new DataSection72(numberDataPoints, (DataRepresentationTemplate52) dataRepresentation, byteBuffer);
-        } else if ( dataRepresentation.getClass().equals(DataRepresentationTemplate53.class) ) {
-            data = new DataSection73(numberDataPoints, (DataRepresentationTemplate53) dataRepresentation, byteBuffer);
-        } else {
-            System.out.println("Data Representation Template Number 7." + dataRepresentation + " not implemented.");
-        }
+    public long getStartPosition() {
+        return startPosition;
     }
 
-    public void setDataRepresentation(int numberDataPoints, DataRepresentationTemplate5x dataRepresentation) {
-        this.numberDataPoints = numberDataPoints;
-        this.dataRepresentation = dataRepresentation;
+    public void setStartPosition(long startPosition) {
+        this.startPosition = startPosition;
     }
 
-    public int getNumberDataPoints() {
-        return numberDataPoints;
+    public long getEndPosition() {
+        return endPosition;
     }
 
-    public void setNumberDataPoints(int numberDataPoints) {
-        this.numberDataPoints = numberDataPoints;
-    }
-
-    public DataRepresentationTemplate5x getDataRepresentation() {
-        return dataRepresentation;
-    }
-
-    public void setDataRepresentation(DataRepresentationTemplate5x dataRepresentation) {
-        this.dataRepresentation = dataRepresentation;
-    }
-
-    public DataSection7x getData() {
-        return data;
-    }
-
-    public void setData(DataSection7x data) {
-        this.data = data;
+    public void setEndPosition(long endPosition) {
+        this.endPosition = endPosition;
     }
 }

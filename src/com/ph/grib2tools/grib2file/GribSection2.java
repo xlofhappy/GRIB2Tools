@@ -7,10 +7,6 @@ public class GribSection2 extends GribSection {
 
     private static final long serialVersionUID = 100L;
 
-    public GribSection2(RandomAccessFile gribFile) throws IOException {
-        super(gribFile);
-    }
-
     @Override
     public void readData(RandomAccessFile gribFile) throws IOException {
         super.readData(gribFile);

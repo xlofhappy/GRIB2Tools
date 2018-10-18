@@ -12,22 +12,11 @@ public class GribSection4 extends GribSection {
 
     private static final long serialVersionUID = 100L;
 
-    /**
-     * Content and structure of a Section 4
-     */
     private short                       numberCoordinateValues;
-    private short                       productDefinitionTemplateNumber;
+    private int                         productDefinitionTemplateNumber;
     private ProductDefinitionTemplate4x productDefinitionTemplate;
     private byte[]                      optionalListOfCoordinates;
 
-
-    public GribSection4(RandomAccessFile gribFile) throws IOException {
-        super(gribFile);
-    }
-
-    public GribSection4(GribSection gribSection) {
-        super(gribSection.getSectionLength(), gribSection.getSectionNumber(), gribSection.getSectionData());
-    }
 
     @Override
     public void readData(RandomAccessFile gribFile) throws IOException {
@@ -36,12 +25,11 @@ public class GribSection4 extends GribSection {
     }
 
     private void readSection() {
-
         ByteBuffer byteBuffer = ByteBuffer.wrap(getSectionData());
-
-        // Parse section and extract data
+        // 6-7
         numberCoordinateValues = byteBuffer.getShort();
-        productDefinitionTemplateNumber = byteBuffer.getShort();
+        // 8-9
+        productDefinitionTemplateNumber = Short.toUnsignedInt(byteBuffer.getShort());
 
         if ( productDefinitionTemplateNumber == 0 ) {
             productDefinitionTemplate = new ProductDefinitionTemplate40(byteBuffer);
@@ -63,7 +51,7 @@ public class GribSection4 extends GribSection {
         this.numberCoordinateValues = numberCoordinateValues;
     }
 
-    public short getProductDefinitionTemplateNumber() {
+    public int getProductDefinitionTemplateNumber() {
         return productDefinitionTemplateNumber;
     }
 

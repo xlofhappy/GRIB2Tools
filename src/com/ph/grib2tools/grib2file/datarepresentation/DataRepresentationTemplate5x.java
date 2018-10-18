@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 public class DataRepresentationTemplate5x implements Serializable {
 
-    private static final long serialVersionUID = 100L;
-
     private float referenceValueR;
     private short binaryScaleFactorE;
     private short decimalScaleFactorD;

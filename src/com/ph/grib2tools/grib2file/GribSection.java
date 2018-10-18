@@ -4,13 +4,13 @@ import java.io.*;
 import java.nio.ByteBuffer;
 
 /**
- * Template of a GRIB Section, valid for Section types from 1 to 7. Not valid for Sections of type 0 and 8
+ * Template of a GRIB2 Section, valid for Section types from 1 to 7. Not valid for Sections of type 0 and 8
  */
 public class GribSection implements Serializable {
 
     private static final long serialVersionUID = 100L;
 
-    private static final int SECTION_HEADER_LENGTH = 5;
+    protected static final int SECTION_HEADER_LENGTH = 5;
 
     /**
      * Length of the section
@@ -25,14 +25,7 @@ public class GribSection implements Serializable {
      */
     private byte[] sectionData;
 
-
-    public GribSection(int len, byte num, byte[] data) {
-        sectionLength = len;
-        sectionNumber = num;
-        sectionData = data;
-    }
-
-    public GribSection(RandomAccessFile grib2File) throws IOException {
+    protected void readSectionHeader(RandomAccessFile grib2File) throws IOException {
         // All Sections of type 1 to 7 begin with a five byte long header. This header consists of a four byte
         // long length of the section, followed by a one byte section number (type)
         byte[] sectionHeader = new byte[SECTION_HEADER_LENGTH];
@@ -44,10 +37,11 @@ public class GribSection implements Serializable {
         sectionNumber = byteBuffer.get();
     }
 
-    public void readData(RandomAccessFile gribFile) throws IOException {
+    public void readData(RandomAccessFile grib2File) throws IOException {
+        readSectionHeader(grib2File);
         // Read complete section
         sectionData = new byte[sectionLength - SECTION_HEADER_LENGTH];
-        gribFile.read(sectionData);
+        grib2File.read(sectionData);
     }
 
     public void writeToStream(OutputStream gribFile) throws IOException {
@@ -129,7 +123,9 @@ public class GribSection implements Serializable {
      */
     public static int correctNegativeInt(int unCorrectedValue) {
         int correctedValue = unCorrectedValue & 0x7fffffff;
-        if ( (unCorrectedValue & 0x80000000L) == 0x80000000L ) { correctedValue = -correctedValue; }
+        if ( (unCorrectedValue & 0x80000000L) == 0x80000000L ) {
+            correctedValue = -correctedValue;
+        }
         return correctedValue;
     }
 
@@ -155,5 +151,10 @@ public class GribSection implements Serializable {
 
     public void setSectionData(byte[] sectionData) {
         this.sectionData = sectionData;
+    }
+
+    public static void main(String[] args) {
+        int a = -2147483468;
+        System.out.println(correctNegativeInt(a));
     }
 }

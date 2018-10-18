@@ -6,11 +6,9 @@ import java.nio.ByteBuffer;
 
 public class GribSection1 extends GribSection {
 
-    private static final long serialVersionUID = 100L;
-
-    private short  generatingCenter;
+    private int    generatingCenter;
     private String generatingCenterName;
-    private short  generatingSubCenter;
+    private int    generatingSubCenter;
     private String generatingSubCenterName;
     /**
      * GRIB master tables version number
@@ -21,7 +19,7 @@ public class GribSection1 extends GribSection {
     private String localTablesVersionDetail;
     private short  significanceOfReferenceTime;
     private String significanceOfReferenceTimeDetail;
-    private short  year;
+    private int    year;
     private byte   month;
     private byte   day;
     private byte   hour;
@@ -33,10 +31,6 @@ public class GribSection1 extends GribSection {
     private String typeName;
     private byte[] reserved;
 
-    public GribSection1(RandomAccessFile gribFile) throws IOException {
-        super(gribFile);
-    }
-
     @Override
     public void readData(RandomAccessFile gribFile) throws IOException {
         super.readData(gribFile);
@@ -47,10 +41,10 @@ public class GribSection1 extends GribSection {
         ByteBuffer byteBuffer = ByteBuffer.wrap(getSectionData());
         // Parse section and extract data
         // 6-7
-        generatingCenter = byteBuffer.getShort();
+        generatingCenter = Short.toUnsignedInt(byteBuffer.getShort());
         generatingCenterName = chooseGeneratingCenterName(generatingCenter);
         // 8-9
-        generatingSubCenter = byteBuffer.getShort();
+        generatingSubCenter = Short.toUnsignedInt(byteBuffer.getShort());
         generatingSubCenterName = chooseGeneratingSubCenterName(generatingSubCenter);
         // 10
         masterTablesVersion = (short) Byte.toUnsignedInt(byteBuffer.get());
@@ -62,7 +56,7 @@ public class GribSection1 extends GribSection {
         significanceOfReferenceTime = (short) Byte.toUnsignedInt(byteBuffer.get());
         significanceOfReferenceTimeDetail = chooseSignificanceOfReferenceTimeDetail(significanceOfReferenceTime);
         // 13-14
-        year = byteBuffer.getShort();
+        year = Short.toUnsignedInt(byteBuffer.getShort());
         // 15
         month = byteBuffer.get();
         // 16
@@ -86,7 +80,7 @@ public class GribSection1 extends GribSection {
         }
     }
 
-    private String chooseGeneratingCenterName(short generatingCenter) {
+    private String chooseGeneratingCenterName(int generatingCenter) {
         String name = "Reserved";
         switch ( generatingCenter ) {
             case 1:
@@ -759,8 +753,8 @@ public class GribSection1 extends GribSection {
         return name;
     }
 
-    private String chooseGeneratingSubCenterName(short generatingSubCenter) {
-        String name = "Reserved";
+    private String chooseGeneratingSubCenterName(int generatingSubCenter) {
+        String name;
         switch ( generatingSubCenter ) {
             case 1:
                 name = "NCEP Re-Analysis Project";
@@ -1030,11 +1024,11 @@ public class GribSection1 extends GribSection {
     }
 
 
-    public short getGeneratingCenter() {
+    public int getGeneratingCenter() {
         return generatingCenter;
     }
 
-    public void setGeneratingCenter(short generatingCenter) {
+    public void setGeneratingCenter(int generatingCenter) {
         this.generatingCenter = generatingCenter;
     }
 
@@ -1046,11 +1040,11 @@ public class GribSection1 extends GribSection {
         this.generatingCenterName = generatingCenterName;
     }
 
-    public short getGeneratingSubCenter() {
+    public int getGeneratingSubCenter() {
         return generatingSubCenter;
     }
 
-    public void setGeneratingSubCenter(short generatingSubCenter) {
+    public void setGeneratingSubCenter(int generatingSubCenter) {
         this.generatingSubCenter = generatingSubCenter;
     }
 
@@ -1110,11 +1104,11 @@ public class GribSection1 extends GribSection {
         this.significanceOfReferenceTimeDetail = significanceOfReferenceTimeDetail;
     }
 
-    public short getYear() {
+    public int getYear() {
         return year;
     }
 
-    public void setYear(short year) {
+    public void setYear(int year) {
         this.year = year;
     }
 

@@ -17,31 +17,23 @@ public class GribSection5 extends GribSection {
      * Content and structure of a Section 5
      */
     private int                          numberDataPoints;
-    private short                        dataRepresentationTemplateNumber;
+    private int                          dataRepresentationTemplateNumber;
     private DataRepresentationTemplate5x dataRepresentationTemplate;
 
 
-    public GribSection5(RandomAccessFile gribfile) throws IOException {
-        super(gribfile);
-    }
-
-    public GribSection5(GribSection gribSection) {
-        super(gribSection.getSectionLength(), gribSection.getSectionNumber(), gribSection.getSectionData());
-    }
-
     @Override
-    public void readData(RandomAccessFile gribfile) throws IOException {
-        super.readData(gribfile);
+    public void readData(RandomAccessFile grib2File) throws IOException {
+        super.readData(grib2File);
         readSection();
     }
 
     private void readSection() {
-
         ByteBuffer byteBuffer = ByteBuffer.wrap(getSectionData());
-
-        // Parse section and extract data
+        // 6-9 Number of data points where one or more values are specified in Section 7 when a bit map is present,
+        //     total number of data points when a bit map is absent.
         numberDataPoints = byteBuffer.getInt();
-        dataRepresentationTemplateNumber = byteBuffer.getShort();
+        // 10-11
+        dataRepresentationTemplateNumber = Short.toUnsignedInt(byteBuffer.getShort());
 
         if ( dataRepresentationTemplateNumber == 0 ) {
             dataRepresentationTemplate = new DataRepresentationTemplate50(byteBuffer);
@@ -60,7 +52,7 @@ public class GribSection5 extends GribSection {
 
     public float calcValue(short unsignedraw) {
         // Calculate value according to the GRIB specification
-        int   raw = adjustUnsignedShort(unsignedraw);
+        int raw = adjustUnsignedShort(unsignedraw);
         return (dataRepresentationTemplate.getReferenceValueR() + (float) (0 + raw) * (float) Math.pow(2, dataRepresentationTemplate.getBinaryScaleFactorE()) / (float) Math.pow(10, dataRepresentationTemplate.getDecimalScaleFactorD()));
     }
 
@@ -72,11 +64,11 @@ public class GribSection5 extends GribSection {
         this.numberDataPoints = numberDataPoints;
     }
 
-    public short getDataRepresentationTemplateNumber() {
+    public int getDataRepresentationTemplateNumber() {
         return dataRepresentationTemplateNumber;
     }
 
-    public void setDataRepresentationTemplateNumber(short dataRepresentationTemplateNumber) {
+    public void setDataRepresentationTemplateNumber(int dataRepresentationTemplateNumber) {
         this.dataRepresentationTemplateNumber = dataRepresentationTemplateNumber;
     }
 

@@ -1,6 +1,8 @@
 package com.ph.grib2tools.grib2file;
 
 import com.ph.grib2tools.grib2file.griddefinition.GridDefinitionTemplate30;
+import com.ph.grib2tools.grib2file.griddefinition.GridDefinitionTemplate31;
+import com.ph.grib2tools.grib2file.griddefinition.GridDefinitionTemplate33;
 import com.ph.grib2tools.grib2file.griddefinition.GridDefinitionTemplate3x;
 
 import java.io.IOException;
@@ -9,26 +11,13 @@ import java.nio.ByteBuffer;
 
 public class GribSection3 extends GribSection {
 
-    private static final long serialVersionUID = 100L;
-
-    /**
-     * Content and structure of a Section 3
-     */
-    private byte                     sourceOfGridDefinition;
-    private int                      numDataPoints;
+    private short                    sourceOfGridDefinition;
+    private long                     numDataPoints;
     private byte                     numOfOctetsForOptionalList;
-    private byte                     interpretationOfList;
-    private short                    gridDefinitionTemplateNumber;
+    private short                    interpretationOfList;
+    private int                      gridDefinitionTemplateNumber;
     private GridDefinitionTemplate3x gridDefinitionTemplate;
     private byte[]                   optionalListOfPoints;
-
-    public GribSection3(RandomAccessFile gribFile) throws IOException {
-        super(gribFile);
-    }
-
-    public GribSection3(GribSection gribSection) {
-        super(gribSection.getSectionLength(), gribSection.getSectionNumber(), gribSection.getSectionData());
-    }
 
     @Override
     public void readData(RandomAccessFile gribFile) throws IOException {
@@ -37,43 +26,47 @@ public class GribSection3 extends GribSection {
     }
 
     private void readSection() {
-
         ByteBuffer byteBuffer = ByteBuffer.wrap(getSectionData());
-
         // 6
-        sourceOfGridDefinition = byteBuffer.get();
+        sourceOfGridDefinition = (short) Byte.toUnsignedInt(byteBuffer.get());
         // 7-10
-        numDataPoints = byteBuffer.getInt();
+        numDataPoints = Integer.toUnsignedLong(byteBuffer.getInt());
         // 11
         numOfOctetsForOptionalList = byteBuffer.get();
         // 12
-        interpretationOfList = byteBuffer.get();
+        interpretationOfList = (short) Byte.toUnsignedInt(byteBuffer.get());
         // 13-14
-        gridDefinitionTemplateNumber = byteBuffer.getShort();
+        gridDefinitionTemplateNumber = Short.toUnsignedInt(byteBuffer.getShort());
 
-        if ( gridDefinitionTemplateNumber == 0 ) {
-            gridDefinitionTemplate = new GridDefinitionTemplate30(byteBuffer);
-        } else {
-            System.out.println("Grid Definition Template Number 3." + gridDefinitionTemplateNumber + " not implemented.");
+        if ( sourceOfGridDefinition == 0 ) {
+            if ( gridDefinitionTemplateNumber == 0 ) {
+                gridDefinitionTemplate = new GridDefinitionTemplate30(byteBuffer);
+            } else if ( gridDefinitionTemplateNumber == 1 || gridDefinitionTemplateNumber == 2) {
+                gridDefinitionTemplate = new GridDefinitionTemplate31(byteBuffer);
+            } else if ( gridDefinitionTemplateNumber == 3) {
+                gridDefinitionTemplate = new GridDefinitionTemplate33(byteBuffer);
+            } else {
+                System.out.println("Grid Definition Template Number 3." + gridDefinitionTemplateNumber + " not implemented.");
+            }
         }
 
         optionalListOfPoints = new byte[numOfOctetsForOptionalList];
         byteBuffer.get(optionalListOfPoints);
     }
 
-    public byte getSourceOfGridDefinition() {
+    public short getSourceOfGridDefinition() {
         return sourceOfGridDefinition;
     }
 
-    public void setSourceOfGridDefinition(byte sourceOfGridDefinition) {
+    public void setSourceOfGridDefinition(short sourceOfGridDefinition) {
         this.sourceOfGridDefinition = sourceOfGridDefinition;
     }
 
-    public int getNumDataPoints() {
+    public long getNumDataPoints() {
         return numDataPoints;
     }
 
-    public void setNumDataPoints(int numDataPoints) {
+    public void setNumDataPoints(long numDataPoints) {
         this.numDataPoints = numDataPoints;
     }
 
@@ -85,19 +78,19 @@ public class GribSection3 extends GribSection {
         this.numOfOctetsForOptionalList = numOfOctetsForOptionalList;
     }
 
-    public byte getInterpretationOfList() {
+    public short getInterpretationOfList() {
         return interpretationOfList;
     }
 
-    public void setInterpretationOfList(byte interpretationOfList) {
+    public void setInterpretationOfList(short interpretationOfList) {
         this.interpretationOfList = interpretationOfList;
     }
 
-    public short getGridDefinitionTemplateNumber() {
+    public int getGridDefinitionTemplateNumber() {
         return gridDefinitionTemplateNumber;
     }
 
-    public void setGridDefinitionTemplateNumber(short gridDefinitionTemplateNumber) {
+    public void setGridDefinitionTemplateNumber(int gridDefinitionTemplateNumber) {
         this.gridDefinitionTemplateNumber = gridDefinitionTemplateNumber;
     }
 
