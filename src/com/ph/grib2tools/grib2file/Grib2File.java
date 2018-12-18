@@ -78,13 +78,13 @@ public class Grib2File implements Serializable {
      */
     private ProductDefinitionTemplate4x getProductDefinitionTemplate() {
         ProductDefinitionTemplate4x productDefinition = null;
-        //        if ( section4.getProductDefinitionTemplateNumber() == 0 ) {
-        //            productDefinition = section4.getProductDefinitionTemplate();
-        //        } else if ( section4.getProductDefinitionTemplateNumber() == 8 ) {
-        //            productDefinition = section4.getProductDefinitionTemplate();
-        //        } else {
-        //            log.severe("Product Definition Template Number 4." + section4.getProductDefinitionTemplateNumber() + " not implemented.");
-        //        }
+//                if ( section4.get(0).getProductDefinitionTemplateNumber() == 0 ) {
+//                    productDefinition = section4.getProductDefinitionTemplate();
+//                } else if ( section4.getProductDefinitionTemplateNumber() == 8 ) {
+//                    productDefinition = section4.getProductDefinitionTemplate();
+//                } else {
+//                    log.severe("Product Definition Template Number 4." + section4.getProductDefinitionTemplateNumber() + " not implemented.");
+//                }
         return productDefinition;
     }
 

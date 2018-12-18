@@ -2,24 +2,10 @@ package com.ph.grib2tools.grib2file;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Grid2FileReader {
 
-    public static List<Grib2File> readFrom(RandomAccessFile grib2File) throws IOException {
-        if ( grib2File == null ) {
-            return null;
-        }
-        ArrayList<Grib2File> grib2FileList = new ArrayList<>();
-        while ( grib2File.getFilePointer() < grib2File.length() ) {
-            Grib2File grib2File1 = Grid2FileReader.read(grib2File);
-            grib2FileList.add(grib2File1);
-        }
-        return grib2FileList;
-    }
-
-    private static Grib2File read(RandomAccessFile sourceGrib2File) throws IOException {
+    public static Grib2File read(RandomAccessFile sourceGrib2File) throws IOException {
         if ( sourceGrib2File == null ) {
             return null;
         }
