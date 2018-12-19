@@ -129,7 +129,7 @@ public class GribSection implements Serializable {
         return correctedValue;
     }
 
-    public int getSectionLength() {
+    int getSectionLength() {
         return sectionLength;
     }
 
@@ -145,7 +145,7 @@ public class GribSection implements Serializable {
         this.sectionNumber = sectionNumber;
     }
 
-    public byte[] getSectionData() {
+    byte[] getSectionData() {
         return sectionData;
     }
 

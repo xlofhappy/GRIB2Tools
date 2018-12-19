@@ -1,5 +1,7 @@
 package com.ph.grib2tools.grib2file;
 
+import java.util.logging.Logger;
+
 /**
  * A representation of a GRIB file containing all meta data and allowing a random
  * access to the data of the GRIB file. While the random access allows great flexibility
@@ -7,6 +9,7 @@ package com.ph.grib2tools.grib2file;
  **/
 public class RandomAccessGribFile extends Grib2File {
 
+    private Logger log = Logger.getLogger("Grib2File");
 
 //    private static final Logger log = Logger.getLogger(RandomAccessGribFile.class.getName());
 //
@@ -140,14 +143,14 @@ public class RandomAccessGribFile extends Grib2File {
      * to calculate the value belonging to the passed position.
      */
     public float interpolateValueAt(int gridIdx, int lat, int lon) {
-//        GribSection5 sec5 = getSection5(gridIdx);
-//        GribSection7 sec7 = getSection7(gridIdx);
+//        GribSection5 sec5 = getSection5().get(gridIdx);
+//        GribSection7 sec7 = getSection7().get(gridIdx);
 //        float        val  = 0;
 //        if ( sec5.getDataRepresentationTemplateNumber() == 0 ) {
 //            DataRepresentationTemplate50 dataRepresentation = (DataRepresentationTemplate50) sec5.getDataRepresentationTemplate();
 //            int                          bytesperval        = dataRepresentation.getNumberBits() / 8;
-//            if ( section3.getGridDefinitionTemplateNumber() == 0 ) {
-//                GridDefinitionTemplate30 gridDefinition = (GridDefinitionTemplate30) section3.getGridDefinitionTemplate();
+//            if ( getSection3().get(gridIdx).getGridDefinitionTemplateNumber() == 0 ) {
+//                GridDefinitionTemplate30 gridDefinition = (GridDefinitionTemplate30) getSection3().get(gridIdx).getGridDefinitionTemplate();
 //                int                      deltaj         = 0;
 //                // Implementation of Scanning Modes
 //                if ( (gridDefinition.getScanningMode() & 0x01) == 0x01 ) {
@@ -188,7 +191,7 @@ public class RandomAccessGribFile extends Grib2File {
 //
 //                // Find i indices of the grid points of the matrix containing the data that surround the
 //                // passed longitude lon
-//                int firstPointLon = gridDefinition.getFirstPointLon() + 0;
+////                int firstPointLon = gridDefinition.getFirstPointLon() + 0;
 //                if ( firstPointLon >= Grib2File.degToUnits(180) ) { firstPointLon -= Grib2File.degToUnits(360); }
 //                int deltalon = lon - firstPointLon;
 //                //int iidx1 = Math.round((float)deltalon / (float)gridDefinition.iDirectionIncrement);

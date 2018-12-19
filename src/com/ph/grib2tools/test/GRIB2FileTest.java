@@ -69,8 +69,8 @@ public class GRIB2FileTest {
 //                }
 //            }
             //             Get grid data
-            double latitude  = 1;
-            double longitude = 1;
+//            double latitude  = 1;
+//            double longitude = 1;
 //            System.out.println("Value at (" + latitude + ", " + longitude + "): " + grib2File.interpolateValueAtLocation(gridid, latitude, longitude));
 
         } catch ( Exception e ) {
