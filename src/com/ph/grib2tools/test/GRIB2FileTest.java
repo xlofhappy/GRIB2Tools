@@ -10,6 +10,7 @@ import java.io.RandomAccessFile;
 public class GRIB2FileTest {
 
     public static void main(String[] args) {
+        Sdasd();
         //        if ( args.length < 1 ) {
         //            System.out.println("Syntax: java GRIB2FileTest <filename> <structureid (optional)>");
         //            return;
@@ -27,7 +28,7 @@ public class GRIB2FileTest {
 
             // Open GRIB2 file and read it
             RandomAccessFile grib2FileRandomAccess = new RandomAccessFile(filename, "r");
-            Grib2File        grib2File              = Grid2FileReader.read(grib2FileRandomAccess);
+            Grib2File        grib2File             = Grid2FileReader.read(grib2FileRandomAccess);
 
             System.out.println(grib2File.getSection0().getDisciplineName());
             for ( GribSection4 gribSection4 : grib2File.getSection4() ) {
@@ -56,25 +57,39 @@ public class GRIB2FileTest {
             for ( GribSection3 gribSection3 : grib2File.getSection3() ) {
                 GridDefinitionTemplate30 gridDefinition = (GridDefinitionTemplate30) gribSection3.getGridDefinitionTemplate();
                 System.out.println("Covered area:");
-//                System.out.println("   from (latitude, longitude): " + Grib2File.unitsToDeg(gridDefinition.getFirstPointLat()) + ", " + Grib2File.unitsToDeg(gridDefinition.getFirstPointLon()));
-//                System.out.println("   to: (latitude, longitude): " + Grib2File.unitsToDeg(gridDefinition.getLastPointLat()) + ", " + Grib2File.unitsToDeg(gridDefinition.getLastPointLon()));
+                //                System.out.println("   from (latitude, longitude): " + Grib2File.unitsToDeg(gridDefinition.getFirstPointLat()) + ", " + Grib2File.unitsToDeg(gridDefinition.getFirstPointLon()));
+                //                System.out.println("   to: (latitude, longitude): " + Grib2File.unitsToDeg(gridDefinition.getLastPointLat()) + ", " + Grib2File.unitsToDeg(gridDefinition.getLastPointLon()));
                 System.out.println("   from (latitude, longitude): " + gridDefinition.getFirstPointLat() + ", " + gridDefinition.getFirstPointLon());
                 System.out.println("   to: (latitude, longitude): " + gridDefinition.getLastPointLat() + ", " + gridDefinition.getLastPointLon());
             }
 
 
-//            for ( GribSection7 gribSection7 : grib2File.getSection7() ) {
-//                for ( int i : gribSection7.getData().getVariablePart() ) {
-//                    System.out.println(i + " \t " + gribFile.getSection7(0).getData().getVariablePart()[i]);
-//                }
-//            }
+            //            for ( GribSection7 gribSection7 : grib2File.getSection7() ) {
+            //                for ( int i : gribSection7.getData().getVariablePart() ) {
+            //                    System.out.println(i + " \t " + gribFile.getSection7(0).getData().getVariablePart()[i]);
+            //                }
+            ////            }
             //             Get grid data
-//            double latitude  = 1;
-//            double longitude = 1;
-//            System.out.println("Value at (" + latitude + ", " + longitude + "): " + grib2File.interpolateValueAtLocation(gridid, latitude, longitude));
+            double latitude  = 1;
+            double longitude = 1;
+            System.out.println("Value at (" + latitude + ", " + longitude + "): " + grib2File.interpolateValueAtLocation(0, latitude, longitude));
 
         } catch ( Exception e ) {
             e.printStackTrace();
         }
+    }
+
+
+    public static void Sdasd() {
+        int    value = -90000000;
+        byte[] src   = new byte[4];
+        src[3] = (byte) ((value >> 24) & 0xFF);
+        src[2] = (byte) ((value >> 16) & 0xFF);
+        src[1] = (byte) ((value >> 8) & 0xFF);
+        src[0] = (byte) (value & 0xFF);
+        System.out.println(src[0]);
+        System.out.println(src[1]);
+        System.out.println(src[2]);
+        System.out.println(src[3]);
     }
 }

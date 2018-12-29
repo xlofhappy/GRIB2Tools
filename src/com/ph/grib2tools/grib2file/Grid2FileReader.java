@@ -48,7 +48,7 @@ public class Grid2FileReader {
                 grib2File.getSection6().add(section6);
             } else if ( sectionNumber == 7 ) {
                 GribSection7 section7 = new GribSection7();
-                sourceGrib2File.seek(sourceGrib2File.getFilePointer() + section7.getSectionLength() - 5);
+                section7.readData(sourceGrib2File);
                 grib2File.getSection7().add(section7);
                 GribSection8 gribSection8 = new GribSection8(sourceGrib2File);
                 if ( gribSection8.isEnd() ) {

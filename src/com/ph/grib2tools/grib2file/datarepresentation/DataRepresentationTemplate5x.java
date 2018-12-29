@@ -5,8 +5,8 @@ import java.io.Serializable;
 public class DataRepresentationTemplate5x implements Serializable {
 
     private float referenceValueR;
-    private short binaryScaleFactorE;
-    private short decimalScaleFactorD;
+    private int binaryScaleFactorE;
+    private int decimalScaleFactorD;
 
     public float getReferenceValueR() {
         return referenceValueR;
@@ -16,19 +16,19 @@ public class DataRepresentationTemplate5x implements Serializable {
         this.referenceValueR = referenceValueR;
     }
 
-    public short getBinaryScaleFactorE() {
+    public int getBinaryScaleFactorE() {
         return binaryScaleFactorE;
     }
 
-    public void setBinaryScaleFactorE(short binaryScaleFactorE) {
+    public void setBinaryScaleFactorE(int binaryScaleFactorE) {
         this.binaryScaleFactorE = binaryScaleFactorE;
     }
 
-    public short getDecimalScaleFactorD() {
+    public int getDecimalScaleFactorD() {
         return decimalScaleFactorD;
     }
 
-    public void setDecimalScaleFactorD(short decimalScaleFactorD) {
+    public void setDecimalScaleFactorD(int decimalScaleFactorD) {
         this.decimalScaleFactorD = decimalScaleFactorD;
     }
 }

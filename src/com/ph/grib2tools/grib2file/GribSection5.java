@@ -7,7 +7,6 @@ import com.ph.grib2tools.grib2file.datarepresentation.DataRepresentationTemplate
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 
 public class GribSection5 extends GribSection {
 
@@ -24,23 +23,22 @@ public class GribSection5 extends GribSection {
     @Override
     public void readData(RandomAccessFile grib2File) throws IOException {
         super.readData(grib2File);
-        readSection();
+        readSection(grib2File);
     }
 
-    private void readSection() {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(getSectionData());
+    private void readSection(RandomAccessFile grib2File) throws IOException {
         // 6-9 Number of data points where one or more values are specified in Section 7 when a bit map is present,
         //     total number of data points when a bit map is absent.
-        numberDataPoints = byteBuffer.getInt();
+        numberDataPoints = DataUtil.int4(grib2File);
         // 10-11
-        dataRepresentationTemplateNumber = Short.toUnsignedInt(byteBuffer.getShort());
+        dataRepresentationTemplateNumber = DataUtil.int2(grib2File);
 
         if ( dataRepresentationTemplateNumber == 0 ) {
-            dataRepresentationTemplate = new DataRepresentationTemplate50(byteBuffer);
+            dataRepresentationTemplate = new DataRepresentationTemplate50(grib2File);
         } else if ( dataRepresentationTemplateNumber == 2 ) {
-            dataRepresentationTemplate = new DataRepresentationTemplate52(byteBuffer);
+            dataRepresentationTemplate = new DataRepresentationTemplate52(grib2File);
         } else if ( dataRepresentationTemplateNumber == 3 ) {
-            dataRepresentationTemplate = new DataRepresentationTemplate53(byteBuffer);
+            dataRepresentationTemplate = new DataRepresentationTemplate53(grib2File);
         } else {
             System.out.println("Data Representation Template Number 5." + dataRepresentationTemplateNumber + " not implemented.");
         }
@@ -53,30 +51,19 @@ public class GribSection5 extends GribSection {
     public float calcValue(short unsignedraw) {
         // Calculate value according to the GRIB specification
         int raw = adjustUnsignedShort(unsignedraw);
-        return (dataRepresentationTemplate.getReferenceValueR() + (float) (0 + raw) * (float) Math.pow(2, dataRepresentationTemplate.getBinaryScaleFactorE()) / (float) Math.pow(10, dataRepresentationTemplate.getDecimalScaleFactorD()));
+        return (dataRepresentationTemplate.getReferenceValueR() + (float) (raw) * (float) Math.pow(2, dataRepresentationTemplate.getBinaryScaleFactorE()) / (float) Math.pow(10, dataRepresentationTemplate.getDecimalScaleFactorD()));
     }
 
     public int getNumberDataPoints() {
         return numberDataPoints;
     }
 
-    public void setNumberDataPoints(int numberDataPoints) {
-        this.numberDataPoints = numberDataPoints;
-    }
-
     public int getDataRepresentationTemplateNumber() {
         return dataRepresentationTemplateNumber;
-    }
-
-    public void setDataRepresentationTemplateNumber(int dataRepresentationTemplateNumber) {
-        this.dataRepresentationTemplateNumber = dataRepresentationTemplateNumber;
     }
 
     public DataRepresentationTemplate5x getDataRepresentationTemplate() {
         return dataRepresentationTemplate;
     }
 
-    public void setDataRepresentationTemplate(DataRepresentationTemplate5x dataRepresentationTemplate) {
-        this.dataRepresentationTemplate = dataRepresentationTemplate;
-    }
 }

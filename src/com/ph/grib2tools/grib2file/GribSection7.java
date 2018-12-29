@@ -8,33 +8,31 @@ public class GribSection7 extends GribSection {
     /**
      * record the data's start position in the GRIB2 File
      */
-    private long startPosition;
+    private long   startPosition;
     /**
      * record the data's end position in the GRIB2 File
      */
-    private long endPosition;
+    private long   endPosition;
+    private byte[] sectionData;
 
     @Override
     public void readData(RandomAccessFile grib2File) throws IOException {
-        super.readSectionHeader(grib2File);
+        super.readData(grib2File);
         startPosition = grib2File.getFilePointer() - SECTION_HEADER_LENGTH;
         endPosition = grib2File.getFilePointer() + getSectionLength() - SECTION_HEADER_LENGTH;
-        grib2File.seek(endPosition);
+        sectionData = new byte[getSectionLength() - SECTION_HEADER_LENGTH];
+        grib2File.read(sectionData);
     }
 
     public long getStartPosition() {
         return startPosition;
     }
 
-    public void setStartPosition(long startPosition) {
-        this.startPosition = startPosition;
+    public byte[] getSectionData() {
+        return sectionData;
     }
 
     public long getEndPosition() {
         return endPosition;
-    }
-
-    public void setEndPosition(long endPosition) {
-        this.endPosition = endPosition;
     }
 }

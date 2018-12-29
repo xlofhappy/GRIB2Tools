@@ -20,21 +20,8 @@ public class GribSection8 implements Serializable {
 
     public GribSection8(RandomAccessFile grib2File) {
         try {
-            // Read complete section
-            byte[] section8 = new byte[4];
-            grib2File.read(section8);
-            ByteBuffer byteBuffer = ByteBuffer.wrap(section8);
-            // Parse section and extract data
-            byteBuffer.get(endIdentifierBytes);
+            grib2File.read(endIdentifierBytes);
         } catch ( Exception e ) {
-            e.printStackTrace();
-        }
-    }
-
-    public void writeToStream(OutputStream gribFile) {
-        try {
-            gribFile.write(endIdentifierBytes);
-        } catch ( IOException e ) {
             e.printStackTrace();
         }
     }

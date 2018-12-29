@@ -1,6 +1,9 @@
 package com.ph.grib2tools.grib2file.productdefinition;
 
-import java.nio.ByteBuffer;
+import com.ph.grib2tools.grib2file.DataUtil;
+
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 public class ProductDefinitionTemplate48 extends ProductDefinitionTemplate4x {
 
@@ -8,30 +11,30 @@ public class ProductDefinitionTemplate48 extends ProductDefinitionTemplate4x {
 
     private ProductDefinitionTemplate40 productDefinitionTemplate40;
 
-    private short                    yearEnd;
-    private byte                     monthEnd;
-    private byte                     dayEnd;
-    private byte                     hourEnd;
-    private byte                     minuteEnd;
-    private byte                     secondEnd;
-    private byte                     numberTimeRangeSpecifications;
+    private int                      yearEnd;
+    private int                      monthEnd;
+    private int                      dayEnd;
+    private int                      hourEnd;
+    private int                      minuteEnd;
+    private int                      secondEnd;
+    private int                      numberTimeRangeSpecifications;
     private int                      totalNumberDataValuesMissing;
     private TimeRangeSpecification[] timeRangeSpecification;
 
 
-    public ProductDefinitionTemplate48(ByteBuffer byteBuffer) {
-        productDefinitionTemplate40 = new ProductDefinitionTemplate40(byteBuffer);
-        yearEnd = byteBuffer.getShort();
-        monthEnd = byteBuffer.get();
-        dayEnd = byteBuffer.get();
-        hourEnd = byteBuffer.get();
-        minuteEnd = byteBuffer.get();
-        secondEnd = byteBuffer.get();
-        numberTimeRangeSpecifications = byteBuffer.get();
-        totalNumberDataValuesMissing = byteBuffer.getInt();
+    public ProductDefinitionTemplate48(RandomAccessFile gribFile) throws IOException {
+        productDefinitionTemplate40 = new ProductDefinitionTemplate40(gribFile);
+        yearEnd = gribFile.read();
+        monthEnd = gribFile.read();
+        dayEnd = gribFile.read();
+        hourEnd = gribFile.read();
+        minuteEnd = gribFile.read();
+        secondEnd = gribFile.read();
+        numberTimeRangeSpecifications = gribFile.read();
+        totalNumberDataValuesMissing = DataUtil.int4(gribFile);
         timeRangeSpecification = new TimeRangeSpecification[numberTimeRangeSpecifications];
         for ( int i = 0; i < numberTimeRangeSpecifications; i++ ) {
-            timeRangeSpecification[i] = new TimeRangeSpecification(byteBuffer);
+            timeRangeSpecification[i] = new TimeRangeSpecification(gribFile);
         }
     }
 
@@ -39,79 +42,39 @@ public class ProductDefinitionTemplate48 extends ProductDefinitionTemplate4x {
         return productDefinitionTemplate40;
     }
 
-    public void setProductDefinitionTemplate40(ProductDefinitionTemplate40 productDefinitionTemplate40) {
-        this.productDefinitionTemplate40 = productDefinitionTemplate40;
-    }
-
-    public short getYearEnd() {
+    public int getYearEnd() {
         return yearEnd;
     }
 
-    public void setYearEnd(short yearEnd) {
-        this.yearEnd = yearEnd;
-    }
-
-    public byte getMonthEnd() {
+    public int getMonthEnd() {
         return monthEnd;
     }
 
-    public void setMonthEnd(byte monthEnd) {
-        this.monthEnd = monthEnd;
-    }
-
-    public byte getDayEnd() {
+    public int getDayEnd() {
         return dayEnd;
     }
 
-    public void setDayEnd(byte dayEnd) {
-        this.dayEnd = dayEnd;
-    }
-
-    public byte getHourEnd() {
+    public int getHourEnd() {
         return hourEnd;
     }
 
-    public void setHourEnd(byte hourEnd) {
-        this.hourEnd = hourEnd;
-    }
-
-    public byte getMinuteEnd() {
+    public int getMinuteEnd() {
         return minuteEnd;
     }
 
-    public void setMinuteEnd(byte minuteEnd) {
-        this.minuteEnd = minuteEnd;
-    }
-
-    public byte getSecondEnd() {
+    public int getSecondEnd() {
         return secondEnd;
     }
 
-    public void setSecondEnd(byte secondEnd) {
-        this.secondEnd = secondEnd;
-    }
-
-    public byte getNumberTimeRangeSpecifications() {
+    public int getNumberTimeRangeSpecifications() {
         return numberTimeRangeSpecifications;
-    }
-
-    public void setNumberTimeRangeSpecifications(byte numberTimeRangeSpecifications) {
-        this.numberTimeRangeSpecifications = numberTimeRangeSpecifications;
     }
 
     public int getTotalNumberDataValuesMissing() {
         return totalNumberDataValuesMissing;
     }
 
-    public void setTotalNumberDataValuesMissing(int totalNumberDataValuesMissing) {
-        this.totalNumberDataValuesMissing = totalNumberDataValuesMissing;
-    }
-
     public TimeRangeSpecification[] getTimeRangeSpecification() {
         return timeRangeSpecification;
-    }
-
-    public void setTimeRangeSpecification(TimeRangeSpecification[] timeRangeSpecification) {
-        this.timeRangeSpecification = timeRangeSpecification;
     }
 }

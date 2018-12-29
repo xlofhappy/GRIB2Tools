@@ -1,6 +1,9 @@
 package com.ph.grib2tools.grib2file.griddefinition;
 
-import java.nio.ByteBuffer;
+import com.ph.grib2tools.grib2file.DataUtil;
+
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 public class GridDefinitionTemplate31 extends GridDefinitionTemplate30 {
 
@@ -9,14 +12,14 @@ public class GridDefinitionTemplate31 extends GridDefinitionTemplate30 {
     private int   angelOfRotationOfProjection;
 
 
-    public GridDefinitionTemplate31(ByteBuffer byteBuffer) {
-        super(byteBuffer);
+    public GridDefinitionTemplate31(RandomAccessFile gribFile) throws IOException {
+        super(gribFile);
         // 73-76
-        latOfSouthernPolOfProjection = byteBuffer.getInt();
+        latOfSouthernPolOfProjection = DataUtil.int4(gribFile);
         // 77-80
-        lonOfSouthernPolOfProjection = byteBuffer.getInt();
+        lonOfSouthernPolOfProjection = DataUtil.int4(gribFile);
         // 81-84
-        angelOfRotationOfProjection = byteBuffer.getInt();
+        angelOfRotationOfProjection = DataUtil.int4(gribFile);
     }
 
     public float getLatOfSouthernPolOfProjection() {

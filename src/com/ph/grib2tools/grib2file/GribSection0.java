@@ -17,8 +17,8 @@ public class GribSection0 implements Serializable {
      */
     private byte[] magicNumberBytes = new byte[4];
     private String name;
-    private short  reserved;
-    private short  discipline;
+    private int    reserved;
+    private int    discipline;
     private String disciplineName;
     private int    editionNumber;
     private long   totalLength;
@@ -27,41 +27,24 @@ public class GribSection0 implements Serializable {
     public GribSection0(RandomAccessFile gribFile) {
         try {
             // Read complete section
-            byte[] section0 = new byte[16];
-            gribFile.read(section0);
-            ByteBuffer byteBuffer = ByteBuffer.wrap(section0);
-
             // 1-4
-            byteBuffer.get(magicNumberBytes);
+            gribFile.read(magicNumberBytes);
             name = new String(magicNumberBytes);
             // 5-6
-            reserved = byteBuffer.getShort();
+            reserved = DataUtil.int2(gribFile);
             // 7
-            discipline = (short) Byte.toUnsignedInt(byteBuffer.get());
+            discipline = gribFile.read();
             disciplineName = chooseDisciplineName(discipline);
             // 8
-            editionNumber = Byte.toUnsignedInt(byteBuffer.get());
+            editionNumber = gribFile.readUnsignedByte();
             // 9-16
-            totalLength = byteBuffer.getLong();
+            totalLength = DataUtil.long8(gribFile);
         } catch ( Exception e ) {
             e.printStackTrace();
         }
     }
 
-    public void writeToStream(OutputStream gribFile) {
-        DataOutputStream dataOut = new DataOutputStream(gribFile);
-        try {
-            gribFile.write(magicNumberBytes);
-            dataOut.writeShort(reserved);
-            gribFile.write(discipline);
-            gribFile.write(editionNumber);
-            dataOut.writeLong(totalLength);
-        } catch ( IOException e ) {
-            e.printStackTrace();
-        }
-    }
-
-    private String chooseDisciplineName(short discipline) {
+    private String chooseDisciplineName(int discipline) {
         String name;
         if ( discipline == 0 ) {
             name = "Meteorological Products";
@@ -108,7 +91,7 @@ public class GribSection0 implements Serializable {
         this.magicNumberBytes = magicNumberBytes;
     }
 
-    public short getReserved() {
+    public int getReserved() {
         return reserved;
     }
 
@@ -116,7 +99,7 @@ public class GribSection0 implements Serializable {
         this.reserved = reserved;
     }
 
-    public short getDiscipline() {
+    public int getDiscipline() {
         return discipline;
     }
 

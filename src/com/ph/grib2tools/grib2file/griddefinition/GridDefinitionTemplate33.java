@@ -1,6 +1,9 @@
 package com.ph.grib2tools.grib2file.griddefinition;
 
-import java.nio.ByteBuffer;
+import com.ph.grib2tools.grib2file.DataUtil;
+
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 public class GridDefinitionTemplate33 extends GridDefinitionTemplate31 {
 
@@ -8,14 +11,14 @@ public class GridDefinitionTemplate33 extends GridDefinitionTemplate31 {
     private float lonOfPoleOfStretching;
     private float stretchingFactor;
 
-    public GridDefinitionTemplate33(ByteBuffer byteBuffer) {
-        super(byteBuffer);
+    public GridDefinitionTemplate33(RandomAccessFile gribFile) throws IOException {
+        super(gribFile);
         // 85-88
-        latOfPoleOfStretching = byteBuffer.getInt();
+        latOfPoleOfStretching = DataUtil.int4(gribFile);
         // 89-92
-        lonOfPoleOfStretching = byteBuffer.getInt();
+        lonOfPoleOfStretching = DataUtil.int4(gribFile);
         // 93-96
-        stretchingFactor = byteBuffer.getInt();
+        stretchingFactor = DataUtil.int4(gribFile);
     }
 
     public float getLatOfPoleOfStretching() {

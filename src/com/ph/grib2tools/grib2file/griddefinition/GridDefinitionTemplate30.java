@@ -1,18 +1,20 @@
 package com.ph.grib2tools.grib2file.griddefinition;
 
+import com.ph.grib2tools.grib2file.DataUtil;
 import com.ph.grib2tools.grib2file.GribSection;
 
-import java.nio.ByteBuffer;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 public class GridDefinitionTemplate30 extends GridDefinitionTemplate3x {
 
-    private short  shapeOfEarth;
+    private int    shapeOfEarth;
     private String shapeOfEarthName;
-    private byte   scaleFactorRadiusSphericalEarth;
+    private int    scaleFactorRadiusSphericalEarth;
     private int    scaledValueRadiusSphericalEarth;
-    private byte   scaleFactorMajorAxisOblateSpheroidEarth;
+    private int    scaleFactorMajorAxisOblateSpheroidEarth;
     private int    scaledValueMajorAxisOblateSpheroidEarth;
-    private byte   scaleFactorMinorAxisOblateSpheroidEarth;
+    private int    scaleFactorMinorAxisOblateSpheroidEarth;
     private int    scaledValueMinorAxisOblateSpheroidEarth;
     private int    numberPointsLon;
     private int    numberPointsLat;
@@ -20,38 +22,38 @@ public class GridDefinitionTemplate30 extends GridDefinitionTemplate3x {
     private int    subdivisionsBasicAngle;
     private float  firstPointLat;
     private float  firstPointLon;
-    private byte   resolutionAndComponentFlags;
+    private int    resolutionAndComponentFlags;
     private float  lastPointLat;
     private float  lastPointLon;
     private int    iDirectionIncrement;
     private int    jDirectionIncrement;
-    private byte   scanningMode;
+    private int    scanningMode;
 
 
-    public GridDefinitionTemplate30(ByteBuffer byteBuffer) {
+    public GridDefinitionTemplate30(RandomAccessFile gribFile) throws IOException {
         // 15
-        shapeOfEarth = (short) Byte.toUnsignedInt(byteBuffer.get());
+        shapeOfEarth = gribFile.read();
         shapeOfEarthName = chooseShapeOfEarthName(shapeOfEarth);
         // 16
-        scaleFactorRadiusSphericalEarth = byteBuffer.get();
+        scaleFactorRadiusSphericalEarth = gribFile.read();
         // 17-20
-        scaledValueRadiusSphericalEarth = byteBuffer.getInt();
+        scaledValueRadiusSphericalEarth = DataUtil.int4(gribFile);
         // 21
-        scaleFactorMajorAxisOblateSpheroidEarth = byteBuffer.get();
+        scaleFactorMajorAxisOblateSpheroidEarth = gribFile.read();
         // 22-25
-        scaledValueMajorAxisOblateSpheroidEarth = byteBuffer.getInt();
+        scaledValueMajorAxisOblateSpheroidEarth = DataUtil.int4(gribFile);
         // 26
-        scaleFactorMinorAxisOblateSpheroidEarth = byteBuffer.get();
+        scaleFactorMinorAxisOblateSpheroidEarth = gribFile.read();
         // 27-30
-        scaledValueMinorAxisOblateSpheroidEarth = byteBuffer.getInt();
+        scaledValueMinorAxisOblateSpheroidEarth = DataUtil.int4(gribFile);
         // 31-34
-        numberPointsLon = byteBuffer.getInt();
+        numberPointsLon = DataUtil.int4(gribFile);
         // 35-38
-        numberPointsLat = byteBuffer.getInt();
+        numberPointsLat = DataUtil.int4(gribFile);
         // 39-42
-        basicAngle = byteBuffer.getInt();
+        basicAngle = DataUtil.int4(gribFile);
         // 43-46
-        subdivisionsBasicAngle = byteBuffer.getInt();
+        subdivisionsBasicAngle = DataUtil.int4(gribFile);
         float rate;
         if ( basicAngle == 0 ) {
             rate = 1 / 1000000F;
@@ -59,25 +61,25 @@ public class GridDefinitionTemplate30 extends GridDefinitionTemplate3x {
             rate = basicAngle * 1F / subdivisionsBasicAngle;
         }
         // 47-50
-        firstPointLat = byteBuffer.getInt() * rate;
+        firstPointLat = DataUtil.int4(gribFile) * rate;
         // 51-54
-        firstPointLon = byteBuffer.getInt() * rate;
+        firstPointLon = DataUtil.int4(gribFile) * rate;
         // 55
-        resolutionAndComponentFlags = byteBuffer.get();
+        resolutionAndComponentFlags = gribFile.read();
         // 56-59
-        lastPointLat = byteBuffer.getInt() * rate;
+        lastPointLat = DataUtil.int4(gribFile) * rate;
         // 60-63
-        lastPointLon = byteBuffer.getInt() * rate;
+        lastPointLon = DataUtil.int4(gribFile) * rate;
         // 64-67
-        iDirectionIncrement = GribSection.correctNegativeInt(byteBuffer.getInt());
+        iDirectionIncrement = GribSection.correctNegativeInt(DataUtil.int4(gribFile));
         // 68-71
-        jDirectionIncrement = GribSection.correctNegativeInt(byteBuffer.getInt());
+        jDirectionIncrement = GribSection.correctNegativeInt(DataUtil.int4(gribFile));
         // 72
-        scanningMode = byteBuffer.get();
+        scanningMode = gribFile.read();
 
     }
 
-    private String chooseShapeOfEarthName(short shapeOfEarth) {
+    private String chooseShapeOfEarthName(int shapeOfEarth) {
         String name;
         switch ( shapeOfEarth ) {
             case 0:
@@ -128,7 +130,7 @@ public class GridDefinitionTemplate30 extends GridDefinitionTemplate3x {
         this.lastPointLon = lastPointLon;
     }
 
-    public short getShapeOfEarth() {
+    public int getShapeOfEarth() {
         return shapeOfEarth;
     }
 
@@ -144,11 +146,11 @@ public class GridDefinitionTemplate30 extends GridDefinitionTemplate3x {
         this.shapeOfEarthName = shapeOfEarthName;
     }
 
-    public byte getScaleFactorRadiusSphericalEarth() {
+    public int getScaleFactorRadiusSphericalEarth() {
         return scaleFactorRadiusSphericalEarth;
     }
 
-    public void setScaleFactorRadiusSphericalEarth(byte scaleFactorRadiusSphericalEarth) {
+    public void setScaleFactorRadiusSphericalEarth(int scaleFactorRadiusSphericalEarth) {
         this.scaleFactorRadiusSphericalEarth = scaleFactorRadiusSphericalEarth;
     }
 
@@ -160,11 +162,11 @@ public class GridDefinitionTemplate30 extends GridDefinitionTemplate3x {
         this.scaledValueRadiusSphericalEarth = scaledValueRadiusSphericalEarth;
     }
 
-    public byte getScaleFactorMajorAxisOblateSpheroidEarth() {
+    public int getScaleFactorMajorAxisOblateSpheroidEarth() {
         return scaleFactorMajorAxisOblateSpheroidEarth;
     }
 
-    public void setScaleFactorMajorAxisOblateSpheroidEarth(byte scaleFactorMajorAxisOblateSpheroidEarth) {
+    public void setScaleFactorMajorAxisOblateSpheroidEarth(int scaleFactorMajorAxisOblateSpheroidEarth) {
         this.scaleFactorMajorAxisOblateSpheroidEarth = scaleFactorMajorAxisOblateSpheroidEarth;
     }
 
@@ -176,11 +178,11 @@ public class GridDefinitionTemplate30 extends GridDefinitionTemplate3x {
         this.scaledValueMajorAxisOblateSpheroidEarth = scaledValueMajorAxisOblateSpheroidEarth;
     }
 
-    public byte getScaleFactorMinorAxisOblateSpheroidEarth() {
+    public int getScaleFactorMinorAxisOblateSpheroidEarth() {
         return scaleFactorMinorAxisOblateSpheroidEarth;
     }
 
-    public void setScaleFactorMinorAxisOblateSpheroidEarth(byte scaleFactorMinorAxisOblateSpheroidEarth) {
+    public void setScaleFactorMinorAxisOblateSpheroidEarth(int scaleFactorMinorAxisOblateSpheroidEarth) {
         this.scaleFactorMinorAxisOblateSpheroidEarth = scaleFactorMinorAxisOblateSpheroidEarth;
     }
 
@@ -240,11 +242,11 @@ public class GridDefinitionTemplate30 extends GridDefinitionTemplate3x {
         this.firstPointLon = firstPointLon;
     }
 
-    public byte getResolutionAndComponentFlags() {
+    public int getResolutionAndComponentFlags() {
         return resolutionAndComponentFlags;
     }
 
-    public void setResolutionAndComponentFlags(byte resolutionAndComponentFlags) {
+    public void setResolutionAndComponentFlags(int resolutionAndComponentFlags) {
         this.resolutionAndComponentFlags = resolutionAndComponentFlags;
     }
 
@@ -280,11 +282,11 @@ public class GridDefinitionTemplate30 extends GridDefinitionTemplate3x {
         this.jDirectionIncrement = jDirectionIncrement;
     }
 
-    public byte getScanningMode() {
+    public int getScanningMode() {
         return scanningMode;
     }
 
-    public void setScanningMode(byte scanningMode) {
+    public void setScanningMode(int scanningMode) {
         this.scanningMode = scanningMode;
     }
 }

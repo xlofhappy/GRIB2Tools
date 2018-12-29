@@ -1,74 +1,53 @@
 package com.ph.grib2tools.grib2file.productdefinition;
 
+import com.ph.grib2tools.grib2file.DataUtil;
+
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.io.Serializable;
-import java.nio.ByteBuffer;
 
 public class TimeRangeSpecification implements Serializable {
 
     private static final long serialVersionUID = 100L;
 
-    private byte statisticalProcess;
-    private byte typeOfTimeIncrement;
-    private byte unitTimeRange;
-    private int  lengthTimeRange;
-    private byte unitTimeIncrement;
-    private int  lengthTimeIncrement;
+    private int statisticalProcess;
+    private int typeOfTimeIncrement;
+    private int unitTimeRange;
+    private int lengthTimeRange;
+    private int unitTimeIncrement;
+    private int lengthTimeIncrement;
 
 
-    public TimeRangeSpecification(ByteBuffer byteBuffer) {
-        statisticalProcess = byteBuffer.get();
-        typeOfTimeIncrement = byteBuffer.get();
-        unitTimeRange = byteBuffer.get();
-        lengthTimeRange = byteBuffer.getInt();
-        unitTimeIncrement = byteBuffer.get();
-        lengthTimeIncrement = byteBuffer.getInt();
+    public TimeRangeSpecification(RandomAccessFile gribFile) throws IOException {
+        statisticalProcess = gribFile.read();
+        typeOfTimeIncrement = gribFile.read();
+        unitTimeRange = gribFile.read();
+        lengthTimeRange = DataUtil.int4(gribFile);
+        unitTimeIncrement = gribFile.read();
+        lengthTimeIncrement = DataUtil.int4(gribFile);
     }
 
-    public byte getStatisticalProcess() {
+    public int getStatisticalProcess() {
         return statisticalProcess;
     }
 
-    public void setStatisticalProcess(byte statisticalProcess) {
-        this.statisticalProcess = statisticalProcess;
-    }
-
-    public byte getTypeOfTimeIncrement() {
+    public int getTypeOfTimeIncrement() {
         return typeOfTimeIncrement;
     }
 
-    public void setTypeOfTimeIncrement(byte typeOfTimeIncrement) {
-        this.typeOfTimeIncrement = typeOfTimeIncrement;
-    }
-
-    public byte getUnitTimeRange() {
+    public int getUnitTimeRange() {
         return unitTimeRange;
-    }
-
-    public void setUnitTimeRange(byte unitTimeRange) {
-        this.unitTimeRange = unitTimeRange;
     }
 
     public int getLengthTimeRange() {
         return lengthTimeRange;
     }
 
-    public void setLengthTimeRange(int lengthTimeRange) {
-        this.lengthTimeRange = lengthTimeRange;
-    }
-
-    public byte getUnitTimeIncrement() {
+    public int getUnitTimeIncrement() {
         return unitTimeIncrement;
-    }
-
-    public void setUnitTimeIncrement(byte unitTimeIncrement) {
-        this.unitTimeIncrement = unitTimeIncrement;
     }
 
     public int getLengthTimeIncrement() {
         return lengthTimeIncrement;
-    }
-
-    public void setLengthTimeIncrement(int lengthTimeIncrement) {
-        this.lengthTimeIncrement = lengthTimeIncrement;
     }
 }

@@ -1,49 +1,49 @@
 package com.ph.grib2tools.grib2file.datarepresentation;
 
-import com.ph.grib2tools.grib2file.GribSection;
+import com.ph.grib2tools.grib2file.DataUtil;
 
-import java.nio.ByteBuffer;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 public class DataRepresentationTemplate52 extends DataRepresentationTemplate50 {
 
     private static final long serialVersionUID = 100L;
 
-    private byte  groupSplittingMethodUsed;
-    private byte  missingValueManagementUsed;
-    private long  primaryMissingValueSubstitute;
-    private long  secondaryMissingValueSubstitute;
-    private int   numberOfGroupsOfDataValues;
-    private short referenceForGroupWidths;
-    private short numberOfBitsUsedForTheGroupWidths;
-    private int   referenceForGroupLengths;
-    private short lengthIncrementForTheGroupLengths;
-    private int   trueLengthOfLastGroup;
-    private short numberOfBitsForScaledGroupLengths;
+    private int  groupSplittingMethodUsed;
+    private int  missingValueManagementUsed;
+    private long primaryMissingValueSubstitute;
+    private long secondaryMissingValueSubstitute;
+    private int  numberOfGroupsOfDataValues;
+    private int  referenceForGroupWidths;
+    private int  numberOfBitsUsedForTheGroupWidths;
+    private int  referenceForGroupLengths;
+    private int  lengthIncrementForTheGroupLengths;
+    private int  trueLengthOfLastGroup;
+    private int  numberOfBitsForScaledGroupLengths;
 
-    public DataRepresentationTemplate52(ByteBuffer byteBuffer) {
-        super(byteBuffer);
-        assert byteBuffer.position() == 21 - 5;
-        groupSplittingMethodUsed = byteBuffer.get();
-        missingValueManagementUsed = byteBuffer.get();
-        primaryMissingValueSubstitute = GribSection.adjustUnsignedInt(byteBuffer.getInt());
-        secondaryMissingValueSubstitute = GribSection.adjustUnsignedInt(byteBuffer.getInt());
+    public DataRepresentationTemplate52(RandomAccessFile grib2File) throws IOException {
+        super(grib2File);
+        groupSplittingMethodUsed = grib2File.read();
+        missingValueManagementUsed = grib2File.read();
+        primaryMissingValueSubstitute = DataUtil.int4(grib2File);
+        secondaryMissingValueSubstitute = DataUtil.int4(grib2File);
         // If negative this will go wrong during data extraction anyway
-        numberOfGroupsOfDataValues = byteBuffer.getInt();
-        referenceForGroupWidths = GribSection.adjustUnsignedByte(byteBuffer.get());
-        numberOfBitsUsedForTheGroupWidths = GribSection.adjustUnsignedByte(byteBuffer.get());
+        numberOfGroupsOfDataValues = DataUtil.int4(grib2File);
+        referenceForGroupWidths = grib2File.read();
+        numberOfBitsUsedForTheGroupWidths = grib2File.read();
         // If negative this will go wrong during data extraction anyway
-        referenceForGroupLengths = byteBuffer.getInt();
-        lengthIncrementForTheGroupLengths = GribSection.adjustUnsignedByte(byteBuffer.get());
+        referenceForGroupLengths = DataUtil.int4(grib2File);
+        lengthIncrementForTheGroupLengths = grib2File.read();
         // If negative this will go wrong during data extraction anyway
-        trueLengthOfLastGroup = byteBuffer.getInt();
-        numberOfBitsForScaledGroupLengths = GribSection.adjustUnsignedByte(byteBuffer.get());
+        trueLengthOfLastGroup = DataUtil.int4(grib2File);
+        numberOfBitsForScaledGroupLengths = grib2File.read();
     }
 
-    public byte getGroupSplittingMethodUsed() {
+    public int getGroupSplittingMethodUsed() {
         return groupSplittingMethodUsed;
     }
 
-    public byte getMissingValueManagementUsed() {
+    public int getMissingValueManagementUsed() {
         return missingValueManagementUsed;
     }
 
@@ -59,11 +59,11 @@ public class DataRepresentationTemplate52 extends DataRepresentationTemplate50 {
         return numberOfGroupsOfDataValues;
     }
 
-    public short getReferenceForGroupWidths() {
+    public int getReferenceForGroupWidths() {
         return referenceForGroupWidths;
     }
 
-    public short getNumberOfBitsUsedForTheGroupWidths() {
+    public int getNumberOfBitsUsedForTheGroupWidths() {
         return numberOfBitsUsedForTheGroupWidths;
     }
 
@@ -71,7 +71,7 @@ public class DataRepresentationTemplate52 extends DataRepresentationTemplate50 {
         return referenceForGroupLengths;
     }
 
-    public short getLengthIncrementForTheGroupLengths() {
+    public int getLengthIncrementForTheGroupLengths() {
         return lengthIncrementForTheGroupLengths;
     }
 
@@ -79,7 +79,7 @@ public class DataRepresentationTemplate52 extends DataRepresentationTemplate50 {
         return trueLengthOfLastGroup;
     }
 
-    public short getNumberOfBitsForScaledGroupLengths() {
+    public int getNumberOfBitsForScaledGroupLengths() {
         return numberOfBitsForScaledGroupLengths;
     }
 }

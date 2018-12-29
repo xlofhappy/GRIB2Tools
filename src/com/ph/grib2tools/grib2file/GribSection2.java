@@ -10,9 +10,9 @@ public class GribSection2 extends GribSection {
     @Override
     public void readData(RandomAccessFile gribFile) throws IOException {
         super.readData(gribFile);
-        readSection();
+        readSection(gribFile);
     }
 
-    private void readSection() {
+    private void readSection(RandomAccessFile gribFile) {
     }
 }

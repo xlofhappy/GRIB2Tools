@@ -1,60 +1,63 @@
 package com.ph.grib2tools.grib2file.productdefinition;
 
-import java.nio.ByteBuffer;
+import com.ph.grib2tools.grib2file.DataUtil;
+
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 public class ProductDefinitionTemplate40 extends ProductDefinitionTemplate4x {
 
-    private short  parameterCategory;
+    private int    parameterCategory;
     private String parameterCategoryName;
-    private short  parameterNumber;
+    private int    parameterNumber;
     private String parameterNumberName;
-    private short  typeOfGeneratingProcess;
-    private byte   backgroundGeneratingProcessId;
-    private byte   analysisOrForecastGeneratingProcessId;
-    private short  hoursObservationalDataCutOff;
-    private byte   minutesObservationalDataCutOff;
-    private short  unitTimeRange;
+    private int    typeOfGeneratingProcess;
+    private int    backgroundGeneratingProcessId;
+    private int    analysisOrForecastGeneratingProcessId;
+    private int    hoursObservationalDataCutOff;
+    private int    minutesObservationalDataCutOff;
+    private int    unitTimeRange;
     private int    forecastTime;
-    private short  typeFirstFixedSurface;
-    private byte   scaleFactorFirstFixedSurface;
+    private int    typeFirstFixedSurface;
+    private int    scaleFactorFirstFixedSurface;
     private int    scaledValueFirstFixedSurface;
-    private short  typeSecondFixedSurface;
-    private byte   scaleFactorSecondFixedSurface;
+    private int    typeSecondFixedSurface;
+    private int    scaleFactorSecondFixedSurface;
     private int    scaledValueSecondFixedSurface;
 
 
-    public ProductDefinitionTemplate40(ByteBuffer byteBuffer) {
+    public ProductDefinitionTemplate40(RandomAccessFile gribFile) throws IOException {
         // 10
-        parameterCategory = (short) Byte.toUnsignedInt(byteBuffer.get());
+        parameterCategory = gribFile.read();
         parameterCategoryName = chooseParameterCategoryName(parameterCategory);
         // 11
-        parameterNumber = byteBuffer.get();
+        parameterNumber = gribFile.read();
         // 12
-        typeOfGeneratingProcess = (short) Byte.toUnsignedInt(byteBuffer.get());
+        typeOfGeneratingProcess = gribFile.read();
         // 13
-        backgroundGeneratingProcessId = byteBuffer.get();
+        backgroundGeneratingProcessId = gribFile.read();
         // 14
-        analysisOrForecastGeneratingProcessId = byteBuffer.get();
+        analysisOrForecastGeneratingProcessId = gribFile.read();
         // 15-16
-        hoursObservationalDataCutOff = byteBuffer.getShort();
+        hoursObservationalDataCutOff = DataUtil.int2(gribFile);
         // 17
-        minutesObservationalDataCutOff = byteBuffer.get();
+        minutesObservationalDataCutOff = gribFile.read();
         // 18
-        unitTimeRange = (short) Byte.toUnsignedInt(byteBuffer.get());
+        unitTimeRange = gribFile.read();
         // 19-22
-        forecastTime = byteBuffer.getInt();
+        forecastTime = DataUtil.int4(gribFile);
         // 23
-        typeFirstFixedSurface = (short) Byte.toUnsignedInt(byteBuffer.get());
+        typeFirstFixedSurface = gribFile.read();
         // 24
-        scaleFactorFirstFixedSurface = byteBuffer.get();
+        scaleFactorFirstFixedSurface = gribFile.read();
         // 25-28
-        scaledValueFirstFixedSurface = byteBuffer.getInt();
+        scaledValueFirstFixedSurface = DataUtil.int4(gribFile);
         // 29
-        typeSecondFixedSurface = (short) Byte.toUnsignedInt(byteBuffer.get());
+        typeSecondFixedSurface = gribFile.read();
         // 30
-        scaleFactorSecondFixedSurface = byteBuffer.get();
+        scaleFactorSecondFixedSurface = gribFile.read();
         // 31-34
-        scaledValueSecondFixedSurface = byteBuffer.getInt();
+        scaledValueSecondFixedSurface = DataUtil.int4(gribFile);
     }
 
     /**
@@ -62,7 +65,7 @@ public class ProductDefinitionTemplate40 extends ProductDefinitionTemplate4x {
      *
      * @param parameterCategory
      */
-    private String chooseParameterCategoryName(short parameterCategory) {
+    private String chooseParameterCategoryName(int parameterCategory) {
         String name;
         switch ( parameterCategory ) {
             case 0:
@@ -147,139 +150,71 @@ public class ProductDefinitionTemplate40 extends ProductDefinitionTemplate4x {
         return name;
     }
 
-    public short getParameterCategory() {
+    public int getParameterCategory() {
         return parameterCategory;
-    }
-
-    public void setParameterCategory(short parameterCategory) {
-        this.parameterCategory = parameterCategory;
     }
 
     public String getParameterCategoryName() {
         return parameterCategoryName;
     }
 
-    public void setParameterCategoryName(String parameterCategoryName) {
-        this.parameterCategoryName = parameterCategoryName;
-    }
-
-    public short getParameterNumber() {
+    public int getParameterNumber() {
         return parameterNumber;
-    }
-
-    public void setParameterNumber(short parameterNumber) {
-        this.parameterNumber = parameterNumber;
     }
 
     public String getParameterNumberName() {
         return parameterNumberName;
     }
 
-    public void setParameterNumberName(String parameterNumberName) {
-        this.parameterNumberName = parameterNumberName;
-    }
-
-    public short getTypeOfGeneratingProcess() {
+    public int getTypeOfGeneratingProcess() {
         return typeOfGeneratingProcess;
     }
 
-    public void setTypeOfGeneratingProcess(short typeOfGeneratingProcess) {
-        this.typeOfGeneratingProcess = typeOfGeneratingProcess;
-    }
-
-    public byte getBackgroundGeneratingProcessId() {
+    public int getBackgroundGeneratingProcessId() {
         return backgroundGeneratingProcessId;
     }
 
-    public void setBackgroundGeneratingProcessId(byte backgroundGeneratingProcessId) {
-        this.backgroundGeneratingProcessId = backgroundGeneratingProcessId;
-    }
-
-    public byte getAnalysisOrForecastGeneratingProcessId() {
+    public int getAnalysisOrForecastGeneratingProcessId() {
         return analysisOrForecastGeneratingProcessId;
     }
 
-    public void setAnalysisOrForecastGeneratingProcessId(byte analysisOrForecastGeneratingProcessId) {
-        this.analysisOrForecastGeneratingProcessId = analysisOrForecastGeneratingProcessId;
-    }
-
-    public short getHoursObservationalDataCutOff() {
+    public int getHoursObservationalDataCutOff() {
         return hoursObservationalDataCutOff;
     }
 
-    public void setHoursObservationalDataCutOff(short hoursObservationalDataCutOff) {
-        this.hoursObservationalDataCutOff = hoursObservationalDataCutOff;
-    }
-
-    public byte getMinutesObservationalDataCutOff() {
+    public int getMinutesObservationalDataCutOff() {
         return minutesObservationalDataCutOff;
     }
 
-    public void setMinutesObservationalDataCutOff(byte minutesObservationalDataCutOff) {
-        this.minutesObservationalDataCutOff = minutesObservationalDataCutOff;
-    }
-
-    public short getUnitTimeRange() {
+    public int getUnitTimeRange() {
         return unitTimeRange;
-    }
-
-    public void setUnitTimeRange(short unitTimeRange) {
-        this.unitTimeRange = unitTimeRange;
     }
 
     public int getForecastTime() {
         return forecastTime;
     }
 
-    public void setForecastTime(int forecastTime) {
-        this.forecastTime = forecastTime;
-    }
-
-    public short getTypeFirstFixedSurface() {
+    public int getTypeFirstFixedSurface() {
         return typeFirstFixedSurface;
     }
 
-    public void setTypeFirstFixedSurface(short typeFirstFixedSurface) {
-        this.typeFirstFixedSurface = typeFirstFixedSurface;
-    }
-
-    public byte getScaleFactorFirstFixedSurface() {
+    public int getScaleFactorFirstFixedSurface() {
         return scaleFactorFirstFixedSurface;
-    }
-
-    public void setScaleFactorFirstFixedSurface(byte scaleFactorFirstFixedSurface) {
-        this.scaleFactorFirstFixedSurface = scaleFactorFirstFixedSurface;
     }
 
     public int getScaledValueFirstFixedSurface() {
         return scaledValueFirstFixedSurface;
     }
 
-    public void setScaledValueFirstFixedSurface(int scaledValueFirstFixedSurface) {
-        this.scaledValueFirstFixedSurface = scaledValueFirstFixedSurface;
-    }
-
-    public short getTypeSecondFixedSurface() {
+    public int getTypeSecondFixedSurface() {
         return typeSecondFixedSurface;
     }
 
-    public void setTypeSecondFixedSurface(short typeSecondFixedSurface) {
-        this.typeSecondFixedSurface = typeSecondFixedSurface;
-    }
-
-    public byte getScaleFactorSecondFixedSurface() {
+    public int getScaleFactorSecondFixedSurface() {
         return scaleFactorSecondFixedSurface;
-    }
-
-    public void setScaleFactorSecondFixedSurface(byte scaleFactorSecondFixedSurface) {
-        this.scaleFactorSecondFixedSurface = scaleFactorSecondFixedSurface;
     }
 
     public int getScaledValueSecondFixedSurface() {
         return scaledValueSecondFixedSurface;
-    }
-
-    public void setScaledValueSecondFixedSurface(int scaledValueSecondFixedSurface) {
-        this.scaledValueSecondFixedSurface = scaledValueSecondFixedSurface;
     }
 }

@@ -20,10 +20,6 @@ public class GribSection implements Serializable {
      * Section number
      */
     private byte   sectionNumber;
-    /**
-     * Data of the section
-     */
-    private byte[] sectionData;
 
     protected void readSectionHeader(RandomAccessFile grib2File) throws IOException {
         // All Sections of type 1 to 7 begin with a five byte long header. This header consists of a four byte
@@ -39,16 +35,6 @@ public class GribSection implements Serializable {
 
     public void readData(RandomAccessFile grib2File) throws IOException {
         readSectionHeader(grib2File);
-        // Read complete section
-        sectionData = new byte[sectionLength - SECTION_HEADER_LENGTH];
-        grib2File.read(sectionData);
-    }
-
-    public void writeToStream(OutputStream gribFile) throws IOException {
-        DataOutputStream dataOut = new DataOutputStream(gribFile);
-        dataOut.writeInt(sectionLength);
-        gribFile.write(sectionNumber);
-        gribFile.write(sectionData);
     }
 
     /**
@@ -143,14 +129,6 @@ public class GribSection implements Serializable {
 
     public void setSectionNumber(byte sectionNumber) {
         this.sectionNumber = sectionNumber;
-    }
-
-    byte[] getSectionData() {
-        return sectionData;
-    }
-
-    public void setSectionData(byte[] sectionData) {
-        this.sectionData = sectionData;
     }
 
     public static void main(String[] args) {

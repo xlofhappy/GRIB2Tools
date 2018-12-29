@@ -7,15 +7,14 @@ import com.ph.grib2tools.grib2file.griddefinition.GridDefinitionTemplate3x;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 
 public class GribSection3 extends GribSection {
 
-    private short                    sourceOfGridDefinition;
+    private int                      sourceOfGridDefinition;
     private String                   sourceOfGridDefinitionName;
     private long                     numDataPoints;
-    private short                    numOfOctetsForOptionalList;
-    private short                    interpretationOfList;
+    private int                      numOfOctetsForOptionalList;
+    private int                      interpretationOfList;
     private String                   interpretationOfListName;
     private int                      gridDefinitionTemplateNumber;
     private String                   gridDefinitionTemplateNumberName;
@@ -25,32 +24,31 @@ public class GribSection3 extends GribSection {
     @Override
     public void readData(RandomAccessFile gribFile) throws IOException {
         super.readData(gribFile);
-        readSection();
+        readSection(gribFile);
     }
 
-    private void readSection() {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(getSectionData());
+    private void readSection(RandomAccessFile gribFile) throws IOException {
         // 6
-        sourceOfGridDefinition = (short) Byte.toUnsignedInt(byteBuffer.get());
+        sourceOfGridDefinition = gribFile.read();
         sourceOfGridDefinitionName = chooseSourceOfGridDefinitionName(sourceOfGridDefinition);
         // 7-10
-        numDataPoints = Integer.toUnsignedLong(byteBuffer.getInt());
+        numDataPoints = DataUtil.int4(gribFile);
         // 11
-        numOfOctetsForOptionalList = (short) Byte.toUnsignedInt(byteBuffer.get());
+        numOfOctetsForOptionalList = gribFile.read();
         // 12
-        interpretationOfList = (short) Byte.toUnsignedInt(byteBuffer.get());
+        interpretationOfList = gribFile.read();
         interpretationOfListName = chooseInterpretationOfListName(interpretationOfList);
         // 13-14
-        gridDefinitionTemplateNumber = Short.toUnsignedInt(byteBuffer.getShort());
+        gridDefinitionTemplateNumber = DataUtil.int2(gribFile);
         gridDefinitionTemplateNumberName = chooseGridDefinitionTemplateNumberName(gridDefinitionTemplateNumber);
 
         if ( sourceOfGridDefinition == 0 ) {
             if ( gridDefinitionTemplateNumber == 0 ) {
-                gridDefinitionTemplate = new GridDefinitionTemplate30(byteBuffer);
+                gridDefinitionTemplate = new GridDefinitionTemplate30(gribFile);
             } else if ( gridDefinitionTemplateNumber == 1 || gridDefinitionTemplateNumber == 2 ) {
-                gridDefinitionTemplate = new GridDefinitionTemplate31(byteBuffer);
+                gridDefinitionTemplate = new GridDefinitionTemplate31(gribFile);
             } else if ( gridDefinitionTemplateNumber == 3 ) {
-                gridDefinitionTemplate = new GridDefinitionTemplate33(byteBuffer);
+                gridDefinitionTemplate = new GridDefinitionTemplate33(gribFile);
             } else {
                 //TODO Other Template not implemented
                 System.out.println("Grid Definition Template Number 3." + gridDefinitionTemplateNumber + " not implemented.");
@@ -60,7 +58,7 @@ public class GribSection3 extends GribSection {
         }
 
         optionalListOfPoints = new byte[numOfOctetsForOptionalList];
-        byteBuffer.get(optionalListOfPoints);
+        gribFile.read(optionalListOfPoints);
     }
 
     private String chooseGridDefinitionTemplateNumberName(int gridDefinitionTemplateNumber) {
@@ -167,7 +165,7 @@ public class GribSection3 extends GribSection {
         return name;
     }
 
-    private String chooseSourceOfGridDefinitionName(short sourceOfGridDefinition) {
+    private String chooseSourceOfGridDefinitionName(int sourceOfGridDefinition) {
         String name;
         if ( sourceOfGridDefinition == 0 ) {
             name = "Latitude/Longitude, Also called Equidistant Cylindrical or Plate Caree";
@@ -183,7 +181,7 @@ public class GribSection3 extends GribSection {
         return name;
     }
 
-    private String chooseInterpretationOfListName(short interpretationOfList) {
+    private String chooseInterpretationOfListName(int interpretationOfList) {
         String name;
         if ( interpretationOfList == 0 ) {
             name = "There is no appended list";
@@ -201,7 +199,7 @@ public class GribSection3 extends GribSection {
         return name;
     }
 
-    public short getSourceOfGridDefinition() {
+    public int getSourceOfGridDefinition() {
         return sourceOfGridDefinition;
     }
 
@@ -221,11 +219,11 @@ public class GribSection3 extends GribSection {
         return interpretationOfListName;
     }
 
-    public short getNumOfOctetsForOptionalList() {
+    public int getNumOfOctetsForOptionalList() {
         return numOfOctetsForOptionalList;
     }
 
-    public short getInterpretationOfList() {
+    public int getInterpretationOfList() {
         return interpretationOfList;
     }
 

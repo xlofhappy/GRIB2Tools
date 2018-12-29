@@ -2,7 +2,6 @@ package com.ph.grib2tools.grib2file;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 
 public class GribSection1 extends GribSection {
 
@@ -13,70 +12,69 @@ public class GribSection1 extends GribSection {
     /**
      * GRIB master tables version number
      */
-    private short  masterTablesVersion;
+    private int    masterTablesVersion;
     private String masterTablesVersionDetail;
-    private short  localTablesVersion;
+    private int    localTablesVersion;
     private String localTablesVersionDetail;
-    private short  significanceOfReferenceTime;
+    private int    significanceOfReferenceTime;
     private String significanceOfReferenceTimeDetail;
     private int    year;
-    private byte   month;
-    private byte   day;
-    private byte   hour;
-    private byte   minute;
-    private byte   second;
-    private short  productionStatus;
+    private int    month;
+    private int    day;
+    private int    hour;
+    private int    minute;
+    private int    second;
+    private int    productionStatus;
     private String productionStatusName;
-    private short  type;
+    private int    type;
     private String typeName;
     private byte[] reserved;
 
     @Override
     public void readData(RandomAccessFile gribFile) throws IOException {
         super.readData(gribFile);
-        readSection();
+        readSection(gribFile);
     }
 
-    private void readSection() {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(getSectionData());
+    private void readSection(RandomAccessFile gribFile) throws IOException {
         // Parse section and extract data
         // 6-7
-        generatingCenter = Short.toUnsignedInt(byteBuffer.getShort());
+        generatingCenter = DataUtil.int2(gribFile);
         generatingCenterName = chooseGeneratingCenterName(generatingCenter);
         // 8-9
-        generatingSubCenter = Short.toUnsignedInt(byteBuffer.getShort());
+        generatingSubCenter = DataUtil.int2(gribFile);
         generatingSubCenterName = chooseGeneratingSubCenterName(generatingSubCenter);
         // 10
-        masterTablesVersion = (short) Byte.toUnsignedInt(byteBuffer.get());
+        masterTablesVersion = gribFile.read();
         masterTablesVersionDetail = chooseMasterTablesVersionDetail(masterTablesVersion);
         // 11
-        localTablesVersion = (short) Byte.toUnsignedInt(byteBuffer.get());
+        localTablesVersion = gribFile.read();
         localTablesVersionDetail = chooseLocalTablesVersionDetail(localTablesVersion);
         // 12
-        significanceOfReferenceTime = (short) Byte.toUnsignedInt(byteBuffer.get());
+        significanceOfReferenceTime = gribFile.read();
         significanceOfReferenceTimeDetail = chooseSignificanceOfReferenceTimeDetail(significanceOfReferenceTime);
         // 13-14
-        year = Short.toUnsignedInt(byteBuffer.getShort());
+        year = DataUtil.int2(gribFile);
         // 15
-        month = byteBuffer.get();
+        month = gribFile.read();
         // 16
-        day = byteBuffer.get();
+        day = gribFile.read();
         // 17
-        hour = byteBuffer.get();
+        hour = gribFile.read();
         // 18
-        minute = byteBuffer.get();
+        minute = gribFile.read();
         // 19
-        second = byteBuffer.get();
+        second = gribFile.read();
         // 20
-        productionStatus = (short) Byte.toUnsignedInt(byteBuffer.get());
+        productionStatus = gribFile.read();
         productionStatusName = chooseProductionStatusName(productionStatus);
         // 21
-        type = (short) Byte.toUnsignedInt(byteBuffer.get());
+        type = gribFile.read();
         typeName = chooseTypeName(type);
 
         if ( getSectionLength() > 21 ) {
             reserved = new byte[getSectionLength() - 21];
-            byteBuffer.get(reserved);
+            gribFile.read(reserved);
         }
     }
 
@@ -811,7 +809,7 @@ public class GribSection1 extends GribSection {
         return name;
     }
 
-    private String chooseMasterTablesVersionDetail(short masterTablesVersion) {
+    private String chooseMasterTablesVersionDetail(int masterTablesVersion) {
         String name;
         switch ( masterTablesVersion ) {
             case 0:
@@ -893,7 +891,7 @@ public class GribSection1 extends GribSection {
         return name;
     }
 
-    private String chooseLocalTablesVersionDetail(short localTablesVersion) {
+    private String chooseLocalTablesVersionDetail(int localTablesVersion) {
         String name;
         switch ( localTablesVersion ) {
             case 0:
@@ -909,7 +907,7 @@ public class GribSection1 extends GribSection {
         return name;
     }
 
-    private String chooseSignificanceOfReferenceTimeDetail(short significanceOfReferenceTime) {
+    private String chooseSignificanceOfReferenceTimeDetail(int significanceOfReferenceTime) {
         String name;
         switch ( significanceOfReferenceTime ) {
             case 0:
@@ -935,7 +933,7 @@ public class GribSection1 extends GribSection {
         return name;
     }
 
-    private String chooseProductionStatusName(short productionStatus) {
+    private String chooseProductionStatusName(int productionStatus) {
         String name;
         switch ( productionStatus ) {
             case 0:
@@ -979,7 +977,7 @@ public class GribSection1 extends GribSection {
         return name;
     }
 
-    private String chooseTypeName(short type) {
+    private String chooseTypeName(int type) {
         String name;
         switch ( type ) {
             case 0:
@@ -1056,11 +1054,11 @@ public class GribSection1 extends GribSection {
         this.generatingSubCenterName = generatingSubCenterName;
     }
 
-    public short getMasterTablesVersion() {
+    public int getMasterTablesVersion() {
         return masterTablesVersion;
     }
 
-    public void setMasterTablesVersion(short masterTablesVersion) {
+    public void setMasterTablesVersion(int masterTablesVersion) {
         this.masterTablesVersion = masterTablesVersion;
     }
 
@@ -1072,11 +1070,11 @@ public class GribSection1 extends GribSection {
         this.masterTablesVersionDetail = masterTablesVersionDetail;
     }
 
-    public short getLocalTablesVersion() {
+    public int getLocalTablesVersion() {
         return localTablesVersion;
     }
 
-    public void setLocalTablesVersion(short localTablesVersion) {
+    public void setLocalTablesVersion(int localTablesVersion) {
         this.localTablesVersion = localTablesVersion;
     }
 
@@ -1088,11 +1086,11 @@ public class GribSection1 extends GribSection {
         this.localTablesVersionDetail = localTablesVersionDetail;
     }
 
-    public short getSignificanceOfReferenceTime() {
+    public int getSignificanceOfReferenceTime() {
         return significanceOfReferenceTime;
     }
 
-    public void setSignificanceOfReferenceTime(short significanceOfReferenceTime) {
+    public void setSignificanceOfReferenceTime(int significanceOfReferenceTime) {
         this.significanceOfReferenceTime = significanceOfReferenceTime;
     }
 
@@ -1112,51 +1110,51 @@ public class GribSection1 extends GribSection {
         this.year = year;
     }
 
-    public byte getMonth() {
+    public int getMonth() {
         return month;
     }
 
-    public void setMonth(byte month) {
+    public void setMonth(int month) {
         this.month = month;
     }
 
-    public byte getDay() {
+    public int getDay() {
         return day;
     }
 
-    public void setDay(byte day) {
+    public void setDay(int day) {
         this.day = day;
     }
 
-    public byte getHour() {
+    public int getHour() {
         return hour;
     }
 
-    public void setHour(byte hour) {
+    public void setHour(int hour) {
         this.hour = hour;
     }
 
-    public byte getMinute() {
+    public int getMinute() {
         return minute;
     }
 
-    public void setMinute(byte minute) {
+    public void setMinute(int minute) {
         this.minute = minute;
     }
 
-    public byte getSecond() {
+    public int getSecond() {
         return second;
     }
 
-    public void setSecond(byte second) {
+    public void setSecond(int second) {
         this.second = second;
     }
 
-    public short getProductionStatus() {
+    public int getProductionStatus() {
         return productionStatus;
     }
 
-    public void setProductionStatus(short productionStatus) {
+    public void setProductionStatus(int productionStatus) {
         this.productionStatus = productionStatus;
     }
 
@@ -1168,11 +1166,11 @@ public class GribSection1 extends GribSection {
         this.productionStatusName = productionStatusName;
     }
 
-    public short getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(short type) {
+    public void setType(int type) {
         this.type = type;
     }
 

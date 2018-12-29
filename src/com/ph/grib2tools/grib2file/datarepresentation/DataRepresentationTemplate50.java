@@ -1,27 +1,27 @@
 package com.ph.grib2tools.grib2file.datarepresentation;
 
-import com.ph.grib2tools.grib2file.GribSection;
+import com.ph.grib2tools.grib2file.DataUtil;
 
-import java.nio.ByteBuffer;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 public class DataRepresentationTemplate50 extends DataRepresentationTemplate5x {
 
-    private byte   numberBits;
-    private short  typeOfField;
+    private int    numberBits;
+    private int    typeOfField;
     private String typeOfFieldName;
 
 
-    public DataRepresentationTemplate50(ByteBuffer byteBuffer) {
-
-        super.setReferenceValueR(byteBuffer.getFloat());
-        super.setDecimalScaleFactorD(GribSection.correctNegativeShort(byteBuffer.getShort()));
-        super.setBinaryScaleFactorE(GribSection.correctNegativeShort(byteBuffer.getShort()));
-        numberBits = byteBuffer.get();
-        typeOfField = (short) Byte.toUnsignedInt(byteBuffer.get());
+    public DataRepresentationTemplate50(RandomAccessFile grid2File) throws IOException {
+        super.setReferenceValueR(DataUtil.float4(grid2File));
+        super.setDecimalScaleFactorD(DataUtil.int2(grid2File));
+        super.setBinaryScaleFactorE(DataUtil.int2(grid2File));
+        numberBits = grid2File.read();
+        typeOfField = grid2File.read();
         typeOfFieldName = chooseTypeOfFieldName(typeOfField);
     }
 
-    public String chooseTypeOfFieldName(short typeOfField) {
+    public String chooseTypeOfFieldName(int typeOfField) {
         String name;
         switch ( typeOfField ) {
             case 0:
@@ -41,27 +41,15 @@ public class DataRepresentationTemplate50 extends DataRepresentationTemplate5x {
         return name;
     }
 
-    public byte getNumberBits() {
+    public int getNumberBits() {
         return numberBits;
     }
 
-    public void setNumberBits(byte numberBits) {
-        this.numberBits = numberBits;
-    }
-
-    public short getTypeOfField() {
+    public int getTypeOfField() {
         return typeOfField;
-    }
-
-    public void setTypeOfField(short typeOfField) {
-        this.typeOfField = typeOfField;
     }
 
     public String getTypeOfFieldName() {
         return typeOfFieldName;
-    }
-
-    public void setTypeOfFieldName(String typeOfFieldName) {
-        this.typeOfFieldName = typeOfFieldName;
     }
 }
