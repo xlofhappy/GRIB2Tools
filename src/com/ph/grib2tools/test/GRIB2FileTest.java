@@ -63,6 +63,13 @@ public class GRIB2FileTest {
                 System.out.println("   to: (latitude, longitude): " + gridDefinition.getLastPointLat() + ", " + gridDefinition.getLastPointLon());
             }
 
+            GribSection7 gribSection7 = grib2File.getSection7().get(0);
+            grib2FileRandomAccess.seek(gribSection7.getStartPosition());
+            for ( int i = 0; i < 100; i++ ) {
+                int a = gribSection7.bits2UInt(grib2FileRandomAccess, 10);
+                System.out.println(a);
+            }
+
 
             //            for ( GribSection7 gribSection7 : grib2File.getSection7() ) {
             //                for ( int i : gribSection7.getData().getVariablePart() ) {
